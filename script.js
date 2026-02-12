@@ -212,6 +212,80 @@ async function syncWithAdmin() {
         alert('❌ Erreur de synchronisation');
     }
 }
+// ============================================
+// FONCTIONS DE SAUVEGARDE POUR L'ADMIN
+// ============================================
 
+async function saveDataToJson(data) {
+    try {
+        // Sauvegarde dans localStorage
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        
+        // Simuler une sauvegarde API (pour Netlify)
+        console.log('💾 Données sauvegardées localement');
+        
+        // Option: Sauvegarde vers un backend (si disponible)
+        if (window.API_BACKEND_URL) {
+            const response = await fetch(`${window.API_BACKEND_URL}/api/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': window.API_KEY || ''
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Données synchronisées avec le backend');
+            }
+        }
+        
+        return true;
+    } catch (error) {
+        console.error('❌ Erreur sauvegarde:', error);
+        return false;
+    }
+}
+
+// Fonction pour charger les données depuis le localStorage
+function loadDataFromStorage() {
+    const saved = localStorage.getItem('labmath_data');
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.error('Erreur parsing données:', e);
+        }
+    }
+    return null;
+}
+
+// ============================================
+// INITIALISATION GLOBALE
+// ============================================
+
+// Créer le fond mathématique au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof createMathBackground === 'function') {
+        createMathBackground();
+    }
+    
+    // Mettre à jour l'année dans le footer
+    const yearElements = document.querySelectorAll('#currentYear, .current-year');
+    yearElements.forEach(el => {
+        el.textContent = new Date().getFullYear();
+    });
+});
+
+// ============================================
+// EXPORT DES FONCTIONS GLOBALES
+// ============================================
+
+window.formatDate = formatDate;
+window.truncateText = truncateText;
+window.fetchData = fetchData;
+window.showAlert = showAlert;
+window.saveDataToJson = saveDataToJson;
+window.loadDataFromStorage = loadDataFromStorage;
 // Export global
 window.syncWithAdmin = syncWithAdmin;

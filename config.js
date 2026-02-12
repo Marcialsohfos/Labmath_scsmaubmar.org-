@@ -54,3 +54,52 @@ const MATH_COLORS = {
     darker: '#05080f',
     light: '#e0e0ff'
 };
+
+// ============================================
+// CONFIGURATION LAB_MATH
+// ============================================
+
+const CONFIG = {
+    // Version de l'application
+    VERSION: '2.0.0',
+    
+    // URLs API (à configurer selon votre hébergement)
+    API_URL: window.location.origin,
+    API_KEY: 'labmath_api_secret_2024',
+    
+    // Paramètres d'affichage
+    DISPLAY: {
+        ITEMS_PER_PAGE: 9,
+        ANIMATIONS_ENABLED: true
+    },
+    
+    // Messages système
+    MESSAGES: {
+        SAVE_SUCCESS: '✅ Données sauvegardées avec succès',
+        SAVE_ERROR: '❌ Erreur lors de la sauvegarde',
+        DELETE_CONFIRM: 'Êtes-vous sûr de vouloir supprimer cet élément ?'
+    }
+};
+
+// ============================================
+// EXPORT DE LA CONFIGURATION
+// ============================================
+
+// Rendre la configuration disponible globalement
+window.CONFIG = CONFIG;
+window.MATH_EQUATIONS = MATH_EQUATIONS;
+window.MATH_COLORS = MATH_COLORS;
+
+// ============================================
+// INITIALISATION RAPIDE
+// ============================================
+
+// Vérifier si on est en mode admin
+if (window.location.pathname.includes('admin')) {
+    console.log('🔧 Mode Admin activé');
+    console.log('📁 Version:', CONFIG.VERSION);
+    console.log('🔑 API:', CONFIG.API_URL);
+};
+
+// Exporter la configuration
+window.CONFIG = CONFIG;
