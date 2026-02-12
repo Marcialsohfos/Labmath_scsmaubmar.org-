@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lab_Math - Administration</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">∑</div>
+                <span class="logo-text">Lab_<span style="background: linear-gradient(135deg, #00ffff, #ff00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Math</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Site public</a></li>
+                <li><a href="admin.html" class="nav-link active">Admin</a></li>
+                <li><a href="#" onclick="logout()" class="nav-link">Déconnexion</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Admin Panel -->
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">
+                <span class="gradient-text">Interface</span> d'administration
+            </h1>
+            <p style="color: rgba(224,224,255,0.8); font-size: 1.1rem;">
+                Gérez le contenu mathématique du laboratoire
+            </p>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∫</div>
+                <h3>Activités</h3>
+                <div class="stat-number" id="stat-activites">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem;">∑</div>
+                <h3>Réalisations</h3>
+                <div class="stat-number" id="stat-realisations">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">∏</div>
+                <h3>Annonces</h3>
+                <div class="stat-number" id="stat-annonces">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∂</div>
+                <h3>Offres</h3>
+                <div class="stat-number" id="stat-offres">0</div>
+            </div>
+        </div>
+
+        <!-- Menu de gestion -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+            <div class="math-card" onclick="openModal('activite')">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">📊</div>
+                <h3>Activités</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les activités scientifiques</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle activité</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('realisation')">
+                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 1rem;">🏆</div>
+                <h3>Réalisations</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les projets réalisés</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle réalisation</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('annonce')">
+                <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📢</div>
+                <h3>Annonces</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Publier des annonces</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle annonce</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('offre')">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">💼</div>
+                <h3>Offres</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les offres d'emploi</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle offre</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // Vérification authentification
+        if (!localStorage.getItem('labmath_admin')) {
+            window.location.href = 'login.html';
+        }
+
+        // Déconnexion
+        window.logout = function() {
+            localStorage.removeItem('labmath_admin');
+            window.location.href = 'login.html';
+        };
+
+        // Modal de création
+        window.openModal = function(type) {
+            alert(`Création d'un(e) ${type} - Fonctionnalité à implémenter`);
+        };
+    </script>
+</body>
+</html>

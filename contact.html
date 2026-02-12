@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact - Lab_Math</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">∑</div>
+                <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="about.html" class="nav-link">À propos</a></li>
+                <li><a href="activites.html" class="nav-link">Activités</a></li>
+                <li><a href="realisations.html" class="nav-link">Réalisations</a></li>
+                <li><a href="annonces.html" class="nav-link">Annonces</a></li>
+                <li><a href="offres.html" class="nav-link">Offres</a></li>
+                <li><a href="contact.html" class="nav-link active">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero" style="min-height: 40vh;">
+        <div class="hero-content">
+            <span class="hero-badge">
+                <span class="pulse-dot"></span>
+                Contactez-nous
+            </span>
+            <h1 class="hero-title">
+                <span class="gradient-text">Contactez</span>-nous
+            </h1>
+            <p class="hero-description">
+                Une question, un projet, une collaboration ? Notre équipe est à votre écoute.
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Grid -->
+    <section class="section">
+        <div class="container">
+            <div id="alertContainer"></div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 3rem;">
+                <!-- Informations -->
+                <div>
+                    <div class="math-card" style="margin-bottom: 2rem;">
+                        <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">📍</div>
+                        <h3>Adresse</h3>
+                        <p style="color: rgba(224,224,255,0.7);">
+                            Laboratoire de Mathématiques Appliquées<br>
+                            Université de Yaoundé I<br>
+                            BP 812 Yaoundé, Cameroun
+                        </p>
+                    </div>
+                    
+                    <div class="math-card" style="margin-bottom: 2rem;">
+                        <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">📞</div>
+                        <h3>Téléphone</h3>
+                        <p style="color: rgba(224,224,255,0.7);">
+                            +237 620 307 439<br>
+                            +237 674 651 856
+                        </p>
+                    </div>
+                    
+                    <div class="math-card">
+                        <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">✉️</div>
+                        <h3>Email</h3>
+                        <p style="color: rgba(224,224,255,0.7);">
+                            contact@labmath.cm<br>
+                            support@labmath.cm
+                        </p>
+                    </div>
+                </div>
+                
+                <!-- Formulaire -->
+                <div class="math-card">
+                    <h3 style="margin-bottom: 2rem;">Envoyez-nous un message</h3>
+                    
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Nom complet</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="subject">Sujet</label>
+                            <input type="text" class="form-control" id="subject" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea class="form-control" id="message" rows="5" required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">
+                            <i class="fas fa-paper-plane"></i>
+                            Envoyer le message
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <div class="logo-icon">∑</div>
+                        <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+                    </div>
+                    <p>Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens rapides</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="about.html">À propos</a></li>
+                        <li><a href="activites.html">Activités</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lab_Math. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = this.querySelector('button');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                alert('✅ Message envoyé avec succès ! Nous vous répondrons dans les plus brefs délais.');
+                this.reset();
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> Envoyer le message';
+                btn.disabled = false;
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
