@@ -7,171 +7,6 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Styles supplémentaires pour l'admin */
-        .admin-tabs {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-            padding-bottom: 1rem;
-        }
-        
-        .admin-tab {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            background: transparent;
-            color: #e0e0ff;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            border-radius: 0.5rem;
-            transition: all 0.3s ease;
-        }
-        
-        .admin-tab:hover {
-            background: rgba(102, 126, 234, 0.1);
-            color: #667eea;
-        }
-        
-        .admin-tab.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        
-        .message-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 1rem;
-            padding: 1.5rem;
-            margin-bottom: 1rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-        }
-        
-        .message-card:hover {
-            transform: translateY(-2px);
-            background: rgba(255, 255, 255, 0.08);
-        }
-        
-        .message-card.non-lu {
-            border-left: 4px solid #667eea;
-            background: rgba(102, 126, 234, 0.1);
-        }
-        
-        .message-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        
-        .message-sujet {
-            background: rgba(102, 126, 234, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            margin: 1rem 0;
-        }
-        
-        .message-reponse {
-            margin-top: 1rem;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 1rem;
-            border-radius: 0.5rem;
-        }
-        
-        .reponse-envoyee {
-            background: rgba(40, 167, 69, 0.2);
-            color: #28a745;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-top: 1rem;
-        }
-        
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .modal {
-            background: #1a1a2e;
-            border-radius: 1rem;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            position: relative;
-            border: 1px solid rgba(102, 126, 234, 0.3);
-        }
-        
-        .modal-close {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: transparent;
-            border: none;
-            color: #e0e0ff;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            color: #e0e0ff;
-        }
-        
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            width: 100%;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 0.5rem;
-            color: white;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .badge {
-            display: inline-block;
-            padding: 0.25rem 0.5rem;
-            border-radius: 1rem;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .badge-primary {
-            background: #667eea;
-            color: white;
-        }
-        
-        .badge-success {
-            background: #28a745;
-            color: white;
-        }
-        
-        .loading-spinner {
-            text-align: center;
-            padding: 2rem;
-            color: #667eea;
-        }
-    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -200,118 +35,65 @@
             </p>
         </div>
 
-        <!-- Onglets de navigation -->
-        <div class="admin-tabs">
-            <button class="admin-tab active" onclick="changerOnglet('contenu')" id="tab-contenu">
-                <i class="fas fa-pen"></i> Gestion du contenu
-            </button>
-            <button class="admin-tab" onclick="changerOnglet('messages')" id="tab-messages">
-                <i class="fas fa-envelope"></i> Messages 
-                <span id="messageNonLus" class="badge badge-primary" style="margin-left: 0.5rem;">0</span>
-            </button>
-        </div>
-
-        <!-- SECTION CONTENU (avec compteurs) -->
-        <div id="section-contenu">
-            <!-- Statistiques / Compteurs -->
-            <div class="admin-stats">
-                <div class="stat-card">
-                    <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∫</div>
-                    <h3>Activités</h3>
-                    <div class="stat-number" id="stat-activites">0</div>
-                    <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="openModal('activite')">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
-                <div class="stat-card">
-                    <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem;">∑</div>
-                    <h3>Réalisations</h3>
-                    <div class="stat-number" id="stat-realisations">0</div>
-                    <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="openModal('realisation')">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
-                <div class="stat-card">
-                    <div style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">∏</div>
-                    <h3>Annonces</h3>
-                    <div class="stat-number" id="stat-annonces">0</div>
-                    <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="openModal('annonce')">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
-                <div class="stat-card">
-                    <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∂</div>
-                    <h3>Offres</h3>
-                    <div class="stat-number" id="stat-offres">0</div>
-                    <button class="btn btn-primary" style="margin-top: 0.5rem;" onclick="openModal('offre')">
-                        <i class="fas fa-plus"></i> Ajouter
-                    </button>
-                </div>
+        <!-- Statistiques -->
+        <div class="admin-stats">
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∫</div>
+                <h3>Activités</h3>
+                <div class="stat-number" id="stat-activites">0</div>
             </div>
-
-            <!-- Menu de gestion des éléments -->
-            <div id="liste-elements" style="margin-top: 2rem;">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> Chargement des éléments...
-                </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem;">∑</div>
+                <h3>Réalisations</h3>
+                <div class="stat-number" id="stat-realisations">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">∏</div>
+                <h3>Annonces</h3>
+                <div class="stat-number" id="stat-annonces">0</div>
+            </div>
+            <div class="stat-card">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∂</div>
+                <h3>Offres</h3>
+                <div class="stat-number" id="stat-offres">0</div>
             </div>
         </div>
 
-        <!-- SECTION MESSAGES -->
-        <div id="section-messages" style="display: none;">
-            <h2 style="margin-bottom: 2rem;">Boîte de réception</h2>
-            <div id="messages-container">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> Chargement des messages...
-                </div>
+        <!-- Menu de gestion -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
+            <div class="math-card" onclick="openModal('activite')">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">📊</div>
+                <h3>Activités</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les activités scientifiques</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle activité</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('realisation')">
+                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 1rem;">🏆</div>
+                <h3>Réalisations</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les projets réalisés</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle réalisation</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('annonce')">
+                <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📢</div>
+                <h3>Annonces</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Publier des annonces</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle annonce</button>
+            </div>
+            
+            <div class="math-card" onclick="openModal('offre')">
+                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">💼</div>
+                <h3>Offres</h3>
+                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les offres d'emploi</p>
+                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle offre</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL POUR AJOUTER/MODIFIER -->
-    <div id="modal-overlay" class="modal-overlay">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal()">&times;</button>
-            <h2 id="modal-title" style="margin-bottom: 1.5rem;">Ajouter un élément</h2>
-            <form id="modal-form" onsubmit="sauvegarderElement(event)">
-                <input type="hidden" id="element-id">
-                <input type="hidden" id="element-type">
-                
-                <div class="form-group">
-                    <label for="titre">Titre *</label>
-                    <input type="text" id="titre" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="description">Description *</label>
-                    <textarea id="description" rows="4" required></textarea>
-                </div>
-                
-                <div class="form-group" id="categorie-group">
-                    <label for="categorie">Catégorie</label>
-                    <select id="categorie">
-                        <option value="">Sélectionner une catégorie</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="image">Image (URL)</label>
-                    <input type="url" id="image" placeholder="https://...">
-                </div>
-                
-                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-outline" onclick="closeModal()">Annuler</button>
-                    <button type="submit" class="btn btn-primary">Sauvegarder</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
+    <script src="config.js"></script>
+    <script src="script.js"></script>
     <script>
-        // Configuration API
-        const API_URL = '/.netlify/functions/data-manager';
-        const MESSAGES_API = '/.netlify/functions/messages';
-        
         // Vérification authentification
         if (!localStorage.getItem('labmath_admin')) {
             window.location.href = 'login.html';
@@ -323,408 +105,10 @@
             window.location.href = 'login.html';
         };
 
-        // Variables globales
-        let typeElementCourant = '';
-        let elementCourant = null;
-        let donneesActuelles = null;
-
-        // ==================== GESTION DES ONGLETS ====================
-        window.changerOnglet = function(onglet) {
-            // Mettre à jour les classes des onglets
-            document.getElementById('tab-contenu').className = onglet === 'contenu' ? 'admin-tab active' : 'admin-tab';
-            document.getElementById('tab-messages').className = onglet === 'messages' ? 'admin-tab active' : 'admin-tab';
-            
-            // Afficher/masquer les sections
-            document.getElementById('section-contenu').style.display = onglet === 'contenu' ? 'block' : 'none';
-            document.getElementById('section-messages').style.display = onglet === 'messages' ? 'block' : 'none';
-            
-            if (onglet === 'messages') {
-                chargerMessages();
-            }
-        };
-
-        // ==================== GESTION DES COMPTEURS ET CONTENU ====================
-        
-        // Charger toutes les données
-        async function chargerDonnees() {
-            try {
-                const response = await fetch(API_URL);
-                const data = await response.json();
-                donneesActuelles = data;
-                
-                // Mettre à jour les compteurs
-                if (data.compteurs) {
-                    document.getElementById('stat-activites').textContent = data.compteurs.activites || 0;
-                    document.getElementById('stat-realisations').textContent = data.compteurs.realisations || 0;
-                    document.getElementById('stat-annonces').textContent = data.compteurs.annonces || 0;
-                    document.getElementById('stat-offres').textContent = data.compteurs.offres || 0;
-                }
-                
-                // Afficher la liste des éléments
-                afficherListeElements('activites');
-                
-                return data;
-            } catch (error) {
-                console.error('Erreur chargement:', error);
-                document.getElementById('liste-elements').innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #dc3545;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <p>Erreur de chargement des données</p>
-                        <button onclick="chargerDonnees()" class="btn btn-outline">Réessayer</button>
-                    </div>
-                `;
-            }
-        }
-
-        // Afficher la liste des éléments
-        function afficherListeElements(section) {
-            if (!donneesActuelles || !donneesActuelles[section]) {
-                document.getElementById('liste-elements').innerHTML = '<p>Aucun élément</p>';
-                return;
-            }
-            
-            let html = '<h3 style="margin-bottom: 1rem;">Liste des éléments</h3>';
-            html += '<div style="display: flex; flex-direction: column; gap: 1rem;">';
-            
-            donneesActuelles[section].forEach(element => {
-                html += `
-                    <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <strong>${element.titre}</strong>
-                            <p style="margin: 0.25rem 0; color: #999; font-size: 0.9rem;">${element.description.substring(0, 100)}...</p>
-                            <small style="color: #667eea;">${new Date(element.date_creation).toLocaleDateString('fr-FR')}</small>
-                        </div>
-                        <div style="display: flex; gap: 0.5rem;">
-                            <button onclick="modifierElement('${section}', ${element.id})" class="btn btn-outline" style="padding: 0.25rem 0.5rem;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="supprimerElement('${section}', ${element.id})" class="btn btn-outline" style="padding: 0.25rem 0.5rem; color: #dc3545;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            document.getElementById('liste-elements').innerHTML = html;
-        }
-
-        // ==================== GESTION DU MODAL ====================
-        
-        // Ouvrir le modal pour ajouter
+        // Modal de création
         window.openModal = function(type) {
-            typeElementCourant = type;
-            elementCourant = null;
-            
-            document.getElementById('modal-title').textContent = `Ajouter ${type}`;
-            document.getElementById('element-id').value = '';
-            document.getElementById('element-type').value = type;
-            document.getElementById('titre').value = '';
-            document.getElementById('description').value = '';
-            document.getElementById('image').value = '';
-            
-            // Configurer les catégories selon le type
-            const categorieGroup = document.getElementById('categorie-group');
-            const categorieSelect = document.getElementById('categorie');
-            
-            if (type === 'activite') {
-                categorieGroup.style.display = 'block';
-                categorieSelect.innerHTML = `
-                    <option value="">Sélectionner une catégorie</option>
-                    <option value="seminaire">Séminaire</option>
-                    <option value="publication">Publication</option>
-                    <option value="conference">Conférence</option>
-                    <option value="projet">Projet</option>
-                `;
-            } else if (type === 'offre') {
-                categorieGroup.style.display = 'block';
-                categorieSelect.innerHTML = `
-                    <option value="">Sélectionner un type</option>
-                    <option value="emploi">Emploi</option>
-                    <option value="stage">Stage</option>
-                    <option value="formation">Formation</option>
-                `;
-            } else {
-                categorieGroup.style.display = 'none';
-            }
-            
-            document.getElementById('modal-overlay').style.display = 'flex';
-        };
-
-        // Modifier un élément
-        window.modifierElement = function(section, id) {
-            const element = donneesActuelles[section].find(e => e.id === id);
-            if (!element) return;
-            
-            typeElementCourant = section.slice(0, -1); // enlève le 's' à la fin
-            elementCourant = element;
-            
-            document.getElementById('modal-title').textContent = `Modifier ${typeElementCourant}`;
-            document.getElementById('element-id').value = id;
-            document.getElementById('element-type').value = typeElementCourant;
-            document.getElementById('titre').value = element.titre || '';
-            document.getElementById('description').value = element.description || '';
-            document.getElementById('image').value = element.image || '';
-            
-            if (element.categorie) {
-                document.getElementById('categorie').value = element.categorie;
-            }
-            
-            document.getElementById('modal-overlay').style.display = 'flex';
-        };
-
-        // Fermer le modal
-        window.closeModal = function() {
-            document.getElementById('modal-overlay').style.display = 'none';
-        };
-
-        // Sauvegarder un élément
-        window.sauvegarderElement = async function(event) {
-            event.preventDefault();
-            
-            const type = document.getElementById('element-type').value;
-            const id = document.getElementById('element-id').value;
-            const section = type + 's'; // activite -> activites
-            
-            const element = {
-                titre: document.getElementById('titre').value,
-                description: document.getElementById('description').value,
-                image: document.getElementById('image').value
-            };
-            
-            // Ajouter la catégorie si elle existe
-            const categorie = document.getElementById('categorie')?.value;
-            if (categorie) element.categorie = categorie;
-            
-            // Si c'est une offre, ajouter le type
-            if (type === 'offre') element.type = categorie;
-            
-            try {
-                let response;
-                
-                if (id) {
-                    // Modification
-                    response = await fetch(API_URL, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ section, id, updates: element })
-                    });
-                } else {
-                    // Ajout
-                    response = await fetch(API_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ section, item: element })
-                    });
-                }
-                
-                const result = await response.json();
-                
-                if (result.success || result.compteurs) {
-                    closeModal();
-                    await chargerDonnees(); // Recharger les données
-                    
-                    // Mettre à jour les compteurs
-                    if (result.compteurs) {
-                        document.getElementById('stat-activites').textContent = result.compteurs.activites || 0;
-                        document.getElementById('stat-realisations').textContent = result.compteurs.realisations || 0;
-                        document.getElementById('stat-annonces').textContent = result.compteurs.annonces || 0;
-                        document.getElementById('stat-offres').textContent = result.compteurs.offres || 0;
-                    }
-                    
-                    alert(id ? 'Élément modifié avec succès !' : 'Élément ajouté avec succès !');
-                }
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-                alert('Erreur lors de la sauvegarde');
-            }
-        };
-
-        // Supprimer un élément
-        window.supprimerElement = async function(section, id) {
-            if (!confirm('Êtes-vous sûr de vouloir supprimer cet élément ?')) return;
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ section, id })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success || result.compteurs) {
-                    await chargerDonnees(); // Recharger les données
-                    
-                    // Mettre à jour les compteurs
-                    if (result.compteurs) {
-                        document.getElementById('stat-activites').textContent = result.compteurs.activites || 0;
-                        document.getElementById('stat-realisations').textContent = result.compteurs.realisations || 0;
-                        document.getElementById('stat-annonces').textContent = result.compteurs.annonces || 0;
-                        document.getElementById('stat-offres').textContent = result.compteurs.offres || 0;
-                    }
-                    
-                    alert('Élément supprimé avec succès !');
-                }
-            } catch (error) {
-                console.error('Erreur suppression:', error);
-                alert('Erreur lors de la suppression');
-            }
-        };
-
-        // ==================== GESTION DES MESSAGES ====================
-        
-        // Charger les messages
-        async function chargerMessages() {
-            try {
-                const response = await fetch(MESSAGES_API);
-                const messages = await response.json();
-                
-                const container = document.getElementById('messages-container');
-                
-                if (!messages || messages.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 3rem;">
-                            <i class="fas fa-envelope-open" style="font-size: 3rem; color: #667eea; margin-bottom: 1rem;"></i>
-                            <h3>Aucun message</h3>
-                            <p style="color: #999;">Les messages des visiteurs apparaîtront ici</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Compter les messages non lus
-                const nonLus = messages.filter(m => !m.lu).length;
-                document.getElementById('messageNonLus').textContent = nonLus;
-                
-                // Afficher les messages
-                let html = '';
-                
-                // Trier par date (plus récent d'abord)
-                messages.sort((a, b) => new Date(b.date) - new Date(a.date)).forEach(msg => {
-                    html += `
-                        <div class="message-card ${!msg.lu ? 'non-lu' : ''}">
-                            <div class="message-header">
-                                <div>
-                                    <strong style="font-size: 1.1rem;">${msg.nom}</strong>
-                                    <span style="color: #667eea; margin-left: 1rem;">${msg.email}</span>
-                                </div>
-                                <div style="color: #999; font-size: 0.9rem;">
-                                    ${new Date(msg.date).toLocaleString('fr-FR')}
-                                </div>
-                            </div>
-                            
-                            <div class="message-sujet">
-                                <strong>Sujet:</strong> ${msg.sujet}
-                            </div>
-                            
-                            <div style="margin: 1rem 0; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem;">
-                                ${msg.message}
-                            </div>
-                            
-                            ${!msg.repondu ? `
-                                <div class="message-reponse">
-                                    <h4 style="margin: 0 0 1rem 0;">Répondre</h4>
-                                    <textarea id="reponse-${msg.id}" rows="4" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white; margin-bottom: 1rem;" placeholder="Votre réponse..."></textarea>
-                                    <button onclick="repondreMessage(${msg.id})" class="btn btn-primary">
-                                        <i class="fas fa-reply"></i> Envoyer la réponse
-                                    </button>
-                                </div>
-                            ` : `
-                                <div class="reponse-envoyee">
-                                    <i class="fas fa-check-circle"></i> 
-                                    <strong>Réponse envoyée le ${new Date(msg.date_reponse).toLocaleString('fr-FR')}</strong>
-                                    <div style="margin-top: 0.75rem; padding: 0.75rem; background: white; border-radius: 0.5rem; color: #333;">
-                                        ${msg.reponse}
-                                    </div>
-                                </div>
-                            `}
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = html;
-                
-                // Marquer les messages comme lus
-                marquerCommeLus(messages);
-                
-            } catch (error) {
-                console.error('Erreur chargement messages:', error);
-                document.getElementById('messages-container').innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: #dc3545;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 1rem;"></i>
-                        <p>Erreur de chargement des messages</p>
-                        <button onclick="chargerMessages()" class="btn btn-outline">Réessayer</button>
-                    </div>
-                `;
-            }
-        }
-
-        // Répondre à un message
-        window.repondreMessage = async function(messageId) {
-            const reponse = document.getElementById(`reponse-${messageId}`).value;
-            
-            if (!reponse || !reponse.trim()) {
-                alert('Veuillez écrire une réponse');
-                return;
-            }
-            
-            try {
-                const response = await fetch(MESSAGES_API, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messageId, reponse })
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Réponse envoyée avec succès !');
-                    chargerMessages(); // Recharger la liste
-                } else {
-                    alert('Erreur lors de l\'envoi de la réponse');
-                }
-            } catch (error) {
-                console.error('Erreur:', error);
-                alert('Erreur lors de l\'envoi de la réponse');
-            }
-        };
-
-        // Marquer les messages comme lus
-        async function marquerCommeLus(messages) {
-            // Cette fonction pourrait appeler une API pour marquer comme lu
-            // Pour l'instant, on met juste à jour l'affichage
-            messages.forEach(msg => {
-                if (!msg.lu) msg.lu = true;
-            });
-        }
-
-        // ==================== INITIALISATION ====================
-        
-        // Charger les données au démarrage
-        document.addEventListener('DOMContentLoaded', async () => {
-            await chargerDonnees();
-            // Vérifier s'il y a des messages non lus
-            try {
-                const response = await fetch(MESSAGES_API);
-                const messages = await response.json();
-                const nonLus = messages.filter(m => !m.lu).length;
-                document.getElementById('messageNonLus').textContent = nonLus;
-            } catch (error) {
-                console.error('Erreur chargement compteur messages:', error);
-            }
-        });
-
-        // Fermer le modal si on clique en dehors
-        window.onclick = function(event) {
-            const modal = document.getElementById('modal-overlay');
-            if (event.target === modal) {
-                closeModal();
-            }
+            alert(`Création d'un(e) ${type} - Fonctionnalité à implémenter`);
         };
     </script>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
 </body>
 </html>
