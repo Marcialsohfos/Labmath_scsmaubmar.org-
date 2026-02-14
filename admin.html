@@ -923,65 +923,46 @@
         // SAUVEGARDE DES DONNÉES
         // ============================================
         
-        async function saveItem(event) {
-            event.preventDefault();
-            
-            const type = document.getElementById('itemType').value;
-            const id = document.getElementById('itemId').value || generateId();
-            
-            // Construire l'objet
-            const item = {
-                sync_id: id,
-                titre: document.getElementById('titre').value,
-                description: document.getElementById('description').value,
-                image_url: document.getElementById('image_url').value,
-                date_creation: new Date().toISOString()
-            };
-            
-            // Ajouter les champs spécifiques
-            if (type === 'activite') {
-                item.contenu = document.getElementById('contenu').value;
-                item.auteur = 'Admin';
-                item.est_publie = document.getElementById('est_publie').checked;
-            } else if (type === 'realisation') {
-                item.categorie = document.getElementById('categorie').value;
-                item.date_realisation = document.getElementById('date_realisation').value;
-            } else if (type === 'annonce') {
-                item.contenu = document.getElementById('description').value;
-                item.type_annonce = document.getElementById('type_annonce').value;
-                item.date_debut = document.getElementById('date_debut').value;
-                item.date_fin = document.getElementById('date_fin').value;
-                item.est_active = document.getElementById('est_publie').checked;
-            } else if (type === 'offre') {
-                item.type_offre = document.getElementById('type_offre').value;
-                item.lieu = document.getElementById('lieu').value;
-                item.date_limite = document.getElementById('date_limite').value;
-                item.est_active = document.getElementById('est_publie').checked;
-            }
-            
-            // Sauvegarder
-            await saveItemToData(item, type, id);
-            
-            closeModal();
-            await loadAllData();
-            showAlert('success', `${getTypeLabel(type)} ${id ? 'modifié' : 'créé'} avec succès !`);
-        }
+async function saveItem(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const type = document.getElementById('itemType').value; // 'activite', 'offre', etc.
+    const id = document.getElementById('itemId').value;
 
-        async function saveItemToData(item, type, id) {
-            const key = `${type}s`;
-            if (!appData[key]) appData[key] = [];
-            
-            const index = appData[key].findIndex(i => i.sync_id === id);
-            
-            if (index !== -1) {
-                appData[key][index] = { ...appData[key][index], ...item };
-            } else {
-                appData[key].push(item);
-            }
-            
-            // Sauvegarder dans data.json
-            await saveToDataJson();
-        }
+    // Création de l'objet data
+    const newItem = {
+        sync_id: id || 'id_' + Date.now(),
+        titre: formData.get('titre'),
+        description: formData.get('description'),
+        est_publie: formData.get('est_publie') === 'true',
+        date_creation: new Date().toISOString()
+    };
+
+    // Ajout spécifique selon le type
+    if (type === 'activite') {
+        newItem.contenu = formData.get('contenu');
+        newItem.auteur = "Admin";
+    }
+
+    // 1. Mettre à jour appData (en mémoire)
+    const listName = type + 's'; // transforme 'activite' en 'activites'
+    if (id) {
+        const index = appData[listName].findIndex(item => item.sync_id === id);
+        appData[listName][index] = newItem;
+    } else {
+        appData[listName].push(newItem);
+    }
+
+    // 2. SAUVEGARDE CRUCIALE : Mettre dans le localStorage global
+    // On utilise la même clé que le site public consultera
+    localStorage.setItem('labmath_data', JSON.stringify(appData));
+
+    // 3. Interface
+    closeModal();
+    updateAllTables();
+    updateStats();
+    showAlert('success', 'Enregistré avec succès localement !');
+}
 
         // ============================================
         // SUPPRESSION
