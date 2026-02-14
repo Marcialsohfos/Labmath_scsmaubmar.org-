@@ -47,11 +47,7 @@
     <!-- Liste des réalisations -->
     <section class="section">
         <div class="container">
-            <div id="realisations-container" class="math-grid">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> Chargement des réalisations...
-                </div>
-            </div>
+            <div id="realisations-container" class="math-grid"></div>
         </div>
     </section>
 
@@ -82,71 +78,6 @@
     </footer>
 
     <script src="config.js"></script>
-    <script>
-        async function chargerRealisations() {
-            try {
-                const response = await fetch('data.json?t=' + Date.now());
-                const data = await response.json();
-                
-                const container = document.getElementById('realisations-container');
-                
-                if (data.realisations && data.realisations.length > 0) {
-                    let html = '';
-                    
-                    data.realisations.forEach(realisation => {
-                        html += `
-                            <div class="math-card">
-                                <div class="math-card-header">
-                                    <div class="math-icon">🏆</div>
-                                    <h3>${realisation.titre}</h3>
-                                </div>
-                                <div class="math-card-body">
-                                    <p class="math-date">
-                                        <i class="far fa-calendar-alt"></i> 
-                                        ${new Date(realisation.date_creation).toLocaleDateString('fr-FR', {
-                                            year: 'numeric',
-                                            month: 'long',
-                                            day: 'numeric'
-                                        })}
-                                    </p>
-                                    <p class="math-description">${realisation.description}</p>
-                                    ${realisation.contexte ? `
-                                        <div style="margin-top: 1rem; padding: 1rem; background: #f5f5f5; border-radius: 0.5rem;">
-                                            <strong>Contexte:</strong><br>
-                                            ${realisation.contexte}
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = `
-                        <div class="aucune-realisation" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
-                            <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
-                            <h2 style="margin-bottom: 1rem;">Aucune réalisation pour le moment</h2>
-                            <p style="color: #666;">Les réalisations seront publiées prochainement</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Erreur chargement réalisations:', error);
-                document.getElementById('realisations-container').innerHTML = `
-                    <div class="erreur-chargement" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
-                        <p>Erreur de chargement des réalisations</p>
-                        <button onclick="chargerRealisations()" class="btn btn-outline" style="margin-top: 1rem;">
-                            <i class="fas fa-redo"></i> Réessayer
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', chargerRealisations);
-    </script>
     <script src="script.js"></script>
 </body>
 </html>

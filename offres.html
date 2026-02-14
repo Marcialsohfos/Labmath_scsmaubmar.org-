@@ -59,11 +59,7 @@
     <!-- Liste des offres -->
     <section class="section">
         <div class="container">
-            <div id="offres-container" class="math-grid">
-                <div class="loading-spinner">
-                    <i class="fas fa-spinner fa-spin"></i> Chargement des offres...
-                </div>
-            </div>
+            <div id="offres-container" class="math-grid"></div>
         </div>
     </section>
 
@@ -94,87 +90,6 @@
     </footer>
 
     <script src="config.js"></script>
-    <script>
-        async function chargerOffres() {
-            try {
-                const response = await fetch('data.json?t=' + Date.now());
-                const data = await response.json();
-                
-                const container = document.getElementById('offres-container');
-                
-                if (data.offres && data.offres.length > 0) {
-                    let html = '';
-                    
-                    data.offres.forEach(offre => {
-                        html += `
-                            <div class="math-card" data-category="${offre.type || 'emploi'}">
-                                <div class="math-card-header">
-                                    <div class="math-icon">${offre.type === 'stage' ? '🎓' : '💼'}</div>
-                                    <h3>${offre.titre}</h3>
-                                </div>
-                                <div class="math-card-body">
-                                    <p class="math-date">
-                                        <i class="far fa-calendar-alt"></i> 
-                                        Date limite: ${new Date(offre.date_limite || offre.date_creation).toLocaleDateString('fr-FR')}
-                                    </p>
-                                    <p class="math-description">${offre.description}</p>
-                                    <div style="margin-top: 1rem;">
-                                        <span class="math-tag">${offre.type || 'Emploi'}</span>
-                                        ${offre.lieu ? `<span class="math-tag">📍 ${offre.lieu}</span>` : ''}
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    container.innerHTML = html;
-                } else {
-                    container.innerHTML = `
-                        <div class="aucune-offre" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
-                            <div style="font-size: 4rem; margin-bottom: 1rem;">💼</div>
-                            <h2 style="margin-bottom: 1rem;">Aucune offre pour le moment</h2>
-                            <p style="color: #666;">Les offres d'emploi seront publiées prochainement</p>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Erreur chargement offres:', error);
-                document.getElementById('offres-container').innerHTML = `
-                    <div class="erreur-chargement" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
-                        <p>Erreur de chargement des offres</p>
-                        <button onclick="chargerOffres()" class="btn btn-outline" style="margin-top: 1rem;">
-                            <i class="fas fa-redo"></i> Réessayer
-                        </button>
-                    </div>
-                `;
-            }
-        }
-
-        // Gestion des filtres
-        document.addEventListener('DOMContentLoaded', function() {
-            chargerOffres();
-            
-            const filterButtons = document.querySelectorAll('[data-filter]');
-            filterButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
-                    this.classList.add('active-filter');
-                    
-                    const filter = this.dataset.filter;
-                    const cards = document.querySelectorAll('.math-card');
-                    
-                    cards.forEach(card => {
-                        if (filter === 'all' || card.dataset.category === filter) {
-                            card.style.display = 'block';
-                        } else {
-                            card.style.display = 'none';
-                        }
-                    });
-                });
-            });
-        });
-    </script>
     <script src="script.js"></script>
 </body>
 </html>
