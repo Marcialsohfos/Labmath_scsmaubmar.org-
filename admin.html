@@ -3,10 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lab_Math - Administration</title>
+    <title>Lab_Math - Administration complète</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Styles spécifiques à l'admin */
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .admin-table th {
+            text-align: left;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .admin-table td {
+            padding: 1rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+        
+        .admin-table tr:hover {
+            background: rgba(0, 255, 255, 0.05);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-published {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .status-draft {
+            background: rgba(255, 255, 0, 0.1);
+            color: #ffff00;
+            border: 1px solid #ffff00;
+        }
+        
+        .status-active {
+            background: rgba(0, 255, 0, 0.1);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+        }
+        
+        .status-inactive {
+            background: rgba(255, 0, 0, 0.1);
+            color: #ff0000;
+            border: 1px solid #ff0000;
+        }
+        
+        .action-btn {
+            padding: 0.5rem;
+            margin: 0 0.25rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: transparent;
+            color: var(--light);
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .action-btn.edit:hover {
+            color: var(--primary);
+        }
+        
+        .action-btn.delete:hover {
+            color: #ff4444;
+        }
+        
+        .action-btn.sync:hover {
+            color: var(--accent);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--dark);
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow-neon-strong);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        
+        .modal-close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--light);
+        }
+        
+        .modal-close:hover {
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            border-radius: 10px;
+            color: var(--light);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-neon);
+            background: rgba(0, 255, 255, 0.1);
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .image-preview {
+            width: 100%;
+            height: 150px;
+            border: 2px dashed var(--primary);
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: cover;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            padding-bottom: 0.5rem;
+        }
+        
+        .tab-btn {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            cursor: pointer;
+            font-weight: 500;
+            border-radius: 10px 10px 0 0;
+        }
+        
+        .tab-btn.active {
+            background: rgba(0, 255, 255, 0.1);
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        .sync-status {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+        }
+        
+        .sync-success { background: #00ff00; box-shadow: 0 0 10px #00ff00; }
+        .sync-pending { background: #ffff00; box-shadow: 0 0 10px #ffff00; }
+        .sync-failed { background: #ff0000; box-shadow: 0 0 10px #ff0000; }
+        
+        .alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            background: var(--dark);
+            border-left: 4px solid;
+            box-shadow: var(--shadow-neon);
+            z-index: 2000;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .alert-success { border-color: #00ff00; color: #00ff00; }
+        .alert-error { border-color: #ff0000; color: #ff0000; }
+        .alert-warning { border-color: #ffff00; color: #ffff00; }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -33,6 +284,25 @@
             <p style="color: rgba(224,224,255,0.8); font-size: 1.1rem;">
                 Gérez le contenu mathématique du laboratoire
             </p>
+            
+            <!-- Quick Actions -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem; flex-wrap: wrap;">
+                <button class="btn btn-primary" onclick="openModal('activite', null)">
+                    <i class="fas fa-plus-circle"></i> Nouvelle activité
+                </button>
+                <button class="btn btn-primary" onclick="openModal('realisation', null)">
+                    <i class="fas fa-plus-circle"></i> Nouvelle réalisation
+                </button>
+                <button class="btn btn-primary" onclick="openModal('annonce', null)">
+                    <i class="fas fa-plus-circle"></i> Nouvelle annonce
+                </button>
+                <button class="btn btn-primary" onclick="openModal('offre', null)">
+                    <i class="fas fa-plus-circle"></i> Nouvelle offre
+                </button>
+                <button class="btn btn-outline" onclick="syncAll()">
+                    <i class="fas fa-sync-alt"></i> Synchroniser tout
+                </button>
+            </div>
         </div>
 
         <!-- Statistiques -->
@@ -41,6 +311,7 @@
                 <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∫</div>
                 <h3>Activités</h3>
                 <div class="stat-number" id="stat-activites">0</div>
+                <small id="stat-activites-pub" style="color: #00ff00;">0 publiées</small>
             </div>
             <div class="stat-card">
                 <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem;">∑</div>
@@ -51,64 +322,817 @@
                 <div style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">∏</div>
                 <h3>Annonces</h3>
                 <div class="stat-number" id="stat-annonces">0</div>
+                <small id="stat-annonces-active" style="color: #00ff00;">0 actives</small>
             </div>
             <div class="stat-card">
                 <div style="font-size: 2rem; color: var(--primary); margin-bottom: 0.5rem;">∂</div>
                 <h3>Offres</h3>
                 <div class="stat-number" id="stat-offres">0</div>
+                <small id="stat-offres-active" style="color: #00ff00;">0 actives</small>
             </div>
         </div>
 
-        <!-- Menu de gestion -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-            <div class="math-card" onclick="openModal('activite')">
-                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">📊</div>
-                <h3>Activités</h3>
-                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les activités scientifiques</p>
-                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle activité</button>
+        <!-- Tabs de gestion -->
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('activites')">📊 Activités</button>
+            <button class="tab-btn" onclick="switchTab('realisations')">🏆 Réalisations</button>
+            <button class="tab-btn" onclick="switchTab('annonces')">📢 Annonces</button>
+            <button class="tab-btn" onclick="switchTab('offres')">💼 Offres</button>
+        </div>
+
+        <!-- Tab: Activités -->
+        <div id="tab-activites" class="tab-pane active">
+            <div class="math-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Gestion des activités</h3>
+                    <button class="btn btn-primary" onclick="openModal('activite', null)">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Auteur</th>
+                                <th>Date</th>
+                                <th>Statut</th>
+                                <th>Sync</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="activites-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Réalisations -->
+        <div id="tab-realisations" class="tab-pane">
+            <div class="math-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Gestion des réalisations</h3>
+                    <button class="btn btn-primary" onclick="openModal('realisation', null)">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Catégorie</th>
+                                <th>Date</th>
+                                <th>Sync</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="realisations-table-body">
+                            <tr>
+                                <td colspan="5" style="text-align: center;">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Annonces -->
+        <div id="tab-annonces" class="tab-pane">
+            <div class="math-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Gestion des annonces</h3>
+                    <button class="btn btn-primary" onclick="openModal('annonce', null)">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Validité</th>
+                                <th>Statut</th>
+                                <th>Sync</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="annonces-table-body">
+                            <tr>
+                                <td colspan="6" style="text-align: center;">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab: Offres -->
+        <div id="tab-offres" class="tab-pane">
+            <div class="math-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3>Gestion des offres</h3>
+                    <button class="btn btn-primary" onclick="openModal('offre', null)">
+                        <i class="fas fa-plus"></i> Ajouter
+                    </button>
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Type</th>
+                                <th>Lieu</th>
+                                <th>Date limite</th>
+                                <th>Statut</th>
+                                <th>Sync</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="offres-table-body">
+                            <tr>
+                                <td colspan="7" style="text-align: center;">Chargement...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL - Formulaire d'édition -->
+    <div id="itemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Nouvel élément</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
             </div>
             
-            <div class="math-card" onclick="openModal('realisation')">
-                <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 1rem;">🏆</div>
-                <h3>Réalisations</h3>
-                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les projets réalisés</p>
-                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle réalisation</button>
-            </div>
-            
-            <div class="math-card" onclick="openModal('annonce')">
-                <div style="font-size: 2rem; color: var(--accent); margin-bottom: 1rem;">📢</div>
-                <h3>Annonces</h3>
-                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Publier des annonces</p>
-                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle annonce</button>
-            </div>
-            
-            <div class="math-card" onclick="openModal('offre')">
-                <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">💼</div>
-                <h3>Offres</h3>
-                <p style="color: rgba(224,224,255,0.7); margin: 1rem 0;">Gérer les offres d'emploi</p>
-                <button class="btn btn-primary" style="width: 100%;">➕ Nouvelle offre</button>
-            </div>
+            <form id="itemForm" onsubmit="saveItem(event)">
+                <input type="hidden" id="itemId" name="id">
+                <input type="hidden" id="itemType" name="type">
+                
+                <!-- Champ Titre (commun) -->
+                <div class="form-group">
+                    <label class="form-label">Titre *</label>
+                    <input type="text" class="form-control" id="titre" name="titre" required>
+                </div>
+                
+                <!-- Champ Description (commun) -->
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                </div>
+                
+                <!-- Champ Contenu (activités uniquement) -->
+                <div id="contenu-group" class="form-group" style="display: none;">
+                    <label class="form-label">Contenu détaillé</label>
+                    <textarea class="form-control" id="contenu" name="contenu" rows="5"></textarea>
+                </div>
+                
+                <!-- Champ Image URL -->
+                <div class="form-group">
+                    <label class="form-label">Image URL</label>
+                    <input type="url" class="form-control" id="image_url" name="image_url" placeholder="https://...">
+                </div>
+                
+                <!-- Upload d'image -->
+                <div class="form-group">
+                    <label class="form-label">Ou uploader une image</label>
+                    <input type="file" class="form-control" id="image_file" name="image_file" accept="image/*">
+                    <div id="imagePreview" class="image-preview">
+                        <span style="color: rgba(255,255,255,0.3);">Aperçu de l'image</span>
+                    </div>
+                </div>
+                
+                <!-- Champs dynamiques selon le type -->
+                <div id="dynamicFields"></div>
+                
+                <!-- Statut publication/activation -->
+                <div class="form-group">
+                    <label class="form-label">
+                        <input type="checkbox" id="est_publie" name="est_publie" value="true" checked>
+                        <span id="statusLabel">Publié / Actif</span>
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 2rem;">
+                    <button type="button" class="btn btn-outline" onclick="closeModal()">Annuler</button>
+                    <button type="submit" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </form>
         </div>
     </div>
 
     <script src="config.js"></script>
     <script src="script.js"></script>
     <script>
+        // ============================================
+        // ADMIN - GESTION COMPLÈTE DES DONNÉES
+        // ============================================
+        
         // Vérification authentification
         if (!localStorage.getItem('labmath_admin')) {
             window.location.href = 'login.html';
         }
 
-        // Déconnexion
-        window.logout = function() {
-            localStorage.removeItem('labmath_admin');
-            window.location.href = 'login.html';
+        // Données en cache
+        let appData = {
+            activites: [],
+            realisations: [],
+            annonces: [],
+            offres: []
         };
 
-        // Modal de création
-        window.openModal = function(type) {
-            alert(`Création d'un(e) ${type} - Fonctionnalité à implémenter`);
-        };
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAllData();
+        });
+
+        // ============================================
+        // CHARGEMENT DES DONNÉES
+        // ============================================
+        
+        async function loadAllData() {
+            try {
+                // Charger depuis data.json
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                appData = {
+                    activites: data.activites || [],
+                    realisations: data.realisations || [],
+                    annonces: data.annonces || [],
+                    offres: data.offres || []
+                };
+                
+                updateAllTables();
+                updateStats();
+                
+                // Sauvegarder dans localStorage pour les modifications
+                localStorage.setItem('labmath_data', JSON.stringify(appData));
+                
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                showAlert('error', 'Erreur de chargement des données');
+            }
+        }
+
+        // ============================================
+        // MISE À JOUR DES TABLEAUX
+        // ============================================
+        
+        function updateAllTables() {
+            updateActivitesTable();
+            updateRealisationsTable();
+            updateAnnoncesTable();
+            updateOffresTable();
+        }
+
+        function updateActivitesTable() {
+            const tbody = document.getElementById('activites-table-body');
+            const activites = appData.activites || [];
+            
+            if (activites.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune activité</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = activites.map(a => `
+                <tr>
+                    <td style="font-weight: 600;">${a.titre}</td>
+                    <td>${a.auteur || 'Admin'}</td>
+                    <td>${formatDate(a.date_creation)}</td>
+                    <td>
+                        <span class="status-badge ${a.est_publie ? 'status-published' : 'status-draft'}">
+                            ${a.est_publie ? 'Publié' : 'Brouillon'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="sync-status sync-success"></span>
+                    </td>
+                    <td>
+                        <button class="action-btn edit" onclick="openModal('activite', '${a.sync_id}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteItem('activite', '${a.sync_id}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateRealisationsTable() {
+            const tbody = document.getElementById('realisations-table-body');
+            const realisations = appData.realisations || [];
+            
+            if (realisations.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Aucune réalisation</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = realisations.map(r => `
+                <tr>
+                    <td style="font-weight: 600;">${r.titre}</td>
+                    <td><span class="status-badge status-published">${r.categorie || 'Projet'}</span></td>
+                    <td>${formatDate(r.date_realisation)}</td>
+                    <td>
+                        <span class="sync-status sync-success"></span>
+                    </td>
+                    <td>
+                        <button class="action-btn edit" onclick="openModal('realisation', '${r.sync_id}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteItem('realisation', '${r.sync_id}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateAnnoncesTable() {
+            const tbody = document.getElementById('annonces-table-body');
+            const annonces = appData.annonces || [];
+            
+            if (annonces.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune annonce</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = annonces.map(a => `
+                <tr>
+                    <td style="font-weight: 600;">${a.titre}</td>
+                    <td>${a.type_annonce || 'info'}</td>
+                    <td>${formatDate(a.date_debut)} - ${formatDate(a.date_fin)}</td>
+                    <td>
+                        <span class="status-badge ${a.est_active ? 'status-active' : 'status-inactive'}">
+                            ${a.est_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="sync-status sync-success"></span>
+                    </td>
+                    <td>
+                        <button class="action-btn edit" onclick="openModal('annonce', '${a.sync_id}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteItem('annonce', '${a.sync_id}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function updateOffresTable() {
+            const tbody = document.getElementById('offres-table-body');
+            const offres = appData.offres || [];
+            
+            if (offres.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aucune offre</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = offres.map(o => `
+                <tr>
+                    <td style="font-weight: 600;">${o.titre}</td>
+                    <td>${o.type_offre || 'autre'}</td>
+                    <td>${o.lieu || 'Non spécifié'}</td>
+                    <td>${formatDate(o.date_limite)}</td>
+                    <td>
+                        <span class="status-badge ${o.est_active ? 'status-active' : 'status-inactive'}">
+                            ${o.est_active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="sync-status sync-success"></span>
+                    </td>
+                    <td>
+                        <button class="action-btn edit" onclick="openModal('offre', '${o.sync_id}')" title="Modifier">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" onclick="deleteItem('offre', '${o.sync_id}')" title="Supprimer">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // ============================================
+        // STATISTIQUES
+        // ============================================
+        
+        function updateStats() {
+            document.getElementById('stat-activites').textContent = appData.activites.length;
+            document.getElementById('stat-activites-pub').textContent = 
+                `${appData.activites.filter(a => a.est_publie).length} publiées`;
+            
+            document.getElementById('stat-realisations').textContent = appData.realisations.length;
+            
+            document.getElementById('stat-annonces').textContent = appData.annonces.length;
+            document.getElementById('stat-annonces-active').textContent = 
+                `${appData.annonces.filter(a => a.est_active).length} actives`;
+            
+            document.getElementById('stat-offres').textContent = appData.offres.length;
+            document.getElementById('stat-offres-active').textContent = 
+                `${appData.offres.filter(o => o.est_active).length} actives`;
+        }
+
+        // ============================================
+        // GESTION DU MODAL
+        // ============================================
+        
+        function openModal(type, id = null) {
+            const modal = document.getElementById('itemModal');
+            const form = document.getElementById('itemForm');
+            
+            // Réinitialiser le formulaire
+            form.reset();
+            document.getElementById('itemType').value = type;
+            document.getElementById('itemId').value = id || '';
+            
+            // Configurer le titre
+            const titles = {
+                'activite': 'Activité',
+                'realisation': 'Réalisation',
+                'annonce': 'Annonce',
+                'offre': 'Offre'
+            };
+            document.getElementById('modalTitle').textContent = id ? `Modifier ${titles[type]}` : `Nouvelle ${titles[type]}`;
+            
+            // Afficher/masquer les champs selon le type
+            document.getElementById('contenu-group').style.display = type === 'activite' ? 'block' : 'none';
+            
+            // Configurer les champs dynamiques
+            configureDynamicFields(type);
+            
+            // Si modification, charger les données
+            if (id) {
+                loadItemData(type, id);
+            }
+            
+            modal.classList.add('active');
+        }
+
+        function configureDynamicFields(type) {
+            const container = document.getElementById('dynamicFields');
+            let html = '';
+            
+            switch(type) {
+                case 'realisation':
+                    html = `
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Catégorie</label>
+                                <select class="form-control" id="categorie" name="categorie">
+                                    <option value="Recherche">Recherche</option>
+                                    <option value="Projet">Projet</option>
+                                    <option value="Publication">Publication</option>
+                                    <option value="Innovation">Innovation</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date de réalisation</label>
+                                <input type="date" class="form-control" id="date_realisation" name="date_realisation">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'annonce':
+                    html = `
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Type d'annonce</label>
+                                <select class="form-control" id="type_annonce" name="type_annonce">
+                                    <option value="info">Information</option>
+                                    <option value="urgence">Urgence</option>
+                                    <option value="evenement">Événement</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Date de début</label>
+                                <input type="datetime-local" class="form-control" id="date_debut" name="date_debut">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date de fin</label>
+                                <input type="datetime-local" class="form-control" id="date_fin" name="date_fin">
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'offre':
+                    html = `
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Type d'offre</label>
+                                <select class="form-control" id="type_offre" name="type_offre">
+                                    <option value="emploi">Emploi</option>
+                                    <option value="stage">Stage</option>
+                                    <option value="formation">Formation</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Lieu</label>
+                                <input type="text" class="form-control" id="lieu" name="lieu" placeholder="Yaoundé, Douala, ...">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date limite</label>
+                            <input type="date" class="form-control" id="date_limite" name="date_limite">
+                        </div>
+                    `;
+                    break;
+            }
+            
+            container.innerHTML = html;
+            
+            // Mettre à jour le label du statut
+            const statusLabels = {
+                'activite': 'Publié',
+                'realisation': 'Visible',
+                'annonce': 'Active',
+                'offre': 'Active'
+            };
+            document.getElementById('statusLabel').textContent = statusLabels[type] || 'Publié / Actif';
+        }
+
+        function loadItemData(type, id) {
+            const items = appData[`${type}s`] || appData[`${type}s`] || [];
+            const item = items.find(i => i.sync_id === id);
+            
+            if (!item) return;
+            
+            document.getElementById('titre').value = item.titre || '';
+            document.getElementById('description').value = item.description || '';
+            document.getElementById('contenu').value = item.contenu || '';
+            document.getElementById('image_url').value = item.image_url || '';
+            document.getElementById('est_publie').checked = item.est_publie !== false;
+            
+            // Champs spécifiques
+            if (type === 'realisation') {
+                document.getElementById('categorie').value = item.categorie || 'Projet';
+                if (item.date_realisation) {
+                    document.getElementById('date_realisation').value = item.date_realisation;
+                }
+            } else if (type === 'annonce') {
+                document.getElementById('type_annonce').value = item.type_annonce || 'info';
+                if (item.date_debut) {
+                    document.getElementById('date_debut').value = item.date_debut.slice(0, 16);
+                }
+                if (item.date_fin) {
+                    document.getElementById('date_fin').value = item.date_fin.slice(0, 16);
+                }
+                document.getElementById('est_publie').checked = item.est_active !== false;
+            } else if (type === 'offre') {
+                document.getElementById('type_offre').value = item.type_offre || 'autre';
+                document.getElementById('lieu').value = item.lieu || '';
+                if (item.date_limite) {
+                    document.getElementById('date_limite').value = item.date_limite;
+                }
+                document.getElementById('est_publie').checked = item.est_active !== false;
+            }
+            
+            // Aperçu image
+            if (item.image_url) {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = `<img src="${item.image_url}" alt="Preview">`;
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('itemModal').classList.remove('active');
+        }
+
+        // ============================================
+        // SAUVEGARDE DES DONNÉES
+        // ============================================
+        
+        async function saveItem(event) {
+            event.preventDefault();
+            
+            const type = document.getElementById('itemType').value;
+            const id = document.getElementById('itemId').value || generateId();
+            
+            // Construire l'objet
+            const item = {
+                sync_id: id,
+                titre: document.getElementById('titre').value,
+                description: document.getElementById('description').value,
+                image_url: document.getElementById('image_url').value,
+                date_creation: new Date().toISOString()
+            };
+            
+            // Ajouter les champs spécifiques
+            if (type === 'activite') {
+                item.contenu = document.getElementById('contenu').value;
+                item.auteur = 'Admin';
+                item.est_publie = document.getElementById('est_publie').checked;
+            } else if (type === 'realisation') {
+                item.categorie = document.getElementById('categorie').value;
+                item.date_realisation = document.getElementById('date_realisation').value;
+            } else if (type === 'annonce') {
+                item.contenu = document.getElementById('description').value;
+                item.type_annonce = document.getElementById('type_annonce').value;
+                item.date_debut = document.getElementById('date_debut').value;
+                item.date_fin = document.getElementById('date_fin').value;
+                item.est_active = document.getElementById('est_publie').checked;
+            } else if (type === 'offre') {
+                item.type_offre = document.getElementById('type_offre').value;
+                item.lieu = document.getElementById('lieu').value;
+                item.date_limite = document.getElementById('date_limite').value;
+                item.est_active = document.getElementById('est_publie').checked;
+            }
+            
+            // Sauvegarder
+            await saveItemToData(item, type, id);
+            
+            closeModal();
+            await loadAllData();
+            showAlert('success', `${getTypeLabel(type)} ${id ? 'modifié' : 'créé'} avec succès !`);
+        }
+
+        async function saveItemToData(item, type, id) {
+            const key = `${type}s`;
+            if (!appData[key]) appData[key] = [];
+            
+            const index = appData[key].findIndex(i => i.sync_id === id);
+            
+            if (index !== -1) {
+                appData[key][index] = { ...appData[key][index], ...item };
+            } else {
+                appData[key].push(item);
+            }
+            
+            // Sauvegarder dans data.json
+            await saveToDataJson();
+        }
+
+        // ============================================
+        // SUPPRESSION
+        // ============================================
+        
+        async function deleteItem(type, id) {
+            if (!confirm(`Êtes-vous sûr de vouloir supprimer cet élément ?`)) return;
+            
+            const key = `${type}s`;
+            appData[key] = appData[key].filter(i => i.sync_id !== id);
+            
+            await saveToDataJson();
+            await loadAllData();
+            showAlert('success', 'Élément supprimé avec succès !');
+        }
+
+        // ============================================
+        // SYNCHRONISATION
+        // ============================================
+        
+        async function syncAll() {
+            showAlert('info', 'Synchronisation en cours...');
+            await saveToDataJson();
+            showAlert('success', 'Synchronisation terminée !');
+        }
+
+        // ============================================
+        // UTILITAIRES
+        // ============================================
+        
+        async function saveToDataJson() {
+            try {
+                // Sauvegarder dans localStorage
+                localStorage.setItem('labmath_data', JSON.stringify(appData));
+                
+                // Sauvegarder dans data.json (simulé)
+                const data = {
+                    activites: appData.activites,
+                    realisations: appData.realisations,
+                    annonces: appData.annonces,
+                    offres: appData.offres,
+                    last_update: new Date().toISOString()
+                };
+                
+                // Afficher dans la console (en attendant l'API)
+                console.log('📁 Données sauvegardées:', data);
+                
+                return true;
+            } catch (error) {
+                console.error('Erreur sauvegarde:', error);
+                return false;
+            }
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function getTypeLabel(type) {
+            const labels = {
+                'activite': 'Activité',
+                'realisation': 'Réalisation',
+                'annonce': 'Annonce',
+                'offre': 'Offre'
+            };
+            return labels[type] || type;
+        }
+
+        function switchTab(tabName) {
+            // Cacher tous les tabs
+            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Afficher le tab sélectionné
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function logout() {
+            localStorage.removeItem('labmath_admin');
+            window.location.href = 'login.html';
+        }
+
+        function showAlert(type, message) {
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = message;
+            document.body.appendChild(alert);
+            
+            setTimeout(() => alert.remove(), 3000);
+        }
+
+        // Gestion de l'upload d'image
+        document.getElementById('image_file')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                    document.getElementById('image_url').value = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        window.openModal = openModal;
+        window.closeModal = closeModal;
+        window.saveItem = saveItem;
+        window.deleteItem = deleteItem;
+        window.syncAll = syncAll;
+        window.switchTab = switchTab;
+        window.logout = logout;
     </script>
+
+<script>
+    // Vérification authentification
+    if (!localStorage.getItem('labmath_admin')) {
+        window.location.href = 'login.html';
+    }
+    
+    // Gestionnaire pour le bouton de déconnexion
+    document.addEventListener('DOMContentLoaded', function() {
+        const logoutBtn = document.querySelector('a[href="#"][onclick="logout()"]');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                logout();
+            });
+        }
+    });
+    
+    // Fonction de déconnexion améliorée
+    window.logout = function() {
+        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            localStorage.removeItem('labmath_admin');
+            localStorage.removeItem('labmath_user');
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }
+    };
+</script>
 </body>
 </html>
