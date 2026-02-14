@@ -2,21 +2,12 @@
   "compteurs": {
     "activites": 0,
     "realisations": 0,
-    "offres": 0,
     "annonces": 0,
-    "total": 0
+    "offres": 0
   },
-  "activites": [
-    {
-      "id": 1,
-      "titre": "Séminaire d'analyse numérique",
-      "description": "Présentation des dernières avancées en analyse numérique",
-      "categorie": "seminaire",
-      "date_creation": "2025-02-20T10:30:00"
-    }
-  ],
+  "activites": [],
   "realisations": [],
-  "offres": [],
   "annonces": [],
+  "offres": [],
   "messages": []
 }
