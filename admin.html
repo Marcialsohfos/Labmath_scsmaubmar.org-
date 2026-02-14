@@ -1020,11 +1020,25 @@ async function saveItem(event) {
         // SYNCHRONISATION
         // ============================================
         
-        async function syncAll() {
-            showAlert('info', 'Synchronisation en cours...');
-            await saveToDataJson();
-            showAlert('success', 'Synchronisation terminée !');
+async function syncAll() {
+    try {
+        const response = await fetch('save_data.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appData) // Envoie toutes vos activités, offres, etc.
+        });
+
+        if (response.ok) {
+            showAlert('success', '✅ Site mis à jour pour tous les visiteurs !');
+        } else {
+            throw new Error('Erreur de synchronisation');
         }
+    } catch (error) {
+        showAlert('error', '❌ Échec de la mise à jour : ' + error.message);
+    }
+}
 
         // ============================================
         // UTILITAIRES
