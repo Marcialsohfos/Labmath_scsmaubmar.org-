@@ -600,7 +600,7 @@
         async function loadAllData() {
             try {
                 // Charger depuis data.json
-                const response = await fetch('data.json');
+                const response = await fetch('data.json?t=' + Date.now());
                 const data = await response.json();
                 
                 appData = {
@@ -1169,6 +1169,68 @@ async function initAdmin() {
             window.location.href = 'login.html';
         }
     };
+// --- SAUVEGARDE D'UN ELEMENT ---
+async function saveItem(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const type = formData.get('type') + 's'; // Ajoute un 's' pour correspondre à appData.activites, etc.
+    const id = formData.get('id');
+    
+    const newItem = Object.fromEntries(formData.entries());
+    
+    // Génération ID unique si nouveau
+    if (!id) {
+        newItem.sync_id = 'id_' + Date.now();
+        newItem.date_creation = new Date().toISOString();
+        appData[type].push(newItem);
+    } else {
+        const index = appData[type].findIndex(item => item.sync_id === id);
+        if (index !== -1) appData[type][index] = { ...appData[type][index], ...newItem };
+    }
+
+    updateAllTables();
+    updateStats();
+    closeModal();
+    
+    // Rappel : Sur Netlify, on ne peut pas sauvegarder directement.
+    // On propose donc le téléchargement.
+    showAlert('warning', 'Modifications enregistrées localement. N\'oubliez pas de Synchroniser (Télécharger) !');
+}
+
+// --- SYNCHRONISATION (TELECHARGEMENT POUR GITHUB) ---
+function syncAll() {
+    try {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "data.json");
+        document.body.appendChild(downloadAnchorNode);
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        
+        showAlert('success', 'Fichier data.json prêt ! Remplacez-le sur GitHub pour mettre le site à jour.');
+    } catch (e) {
+        showAlert('error', 'Erreur lors de la préparation du fichier.');
+    }
+}
+
+// --- UTILITAIRES ---
+function closeModal() {
+    document.getElementById('itemModal').classList.remove('active');
+}
+
+function showAlert(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.innerHTML = message;
+    document.body.appendChild(alert);
+    setTimeout(() => alert.remove(), 4000);
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return 'N/A';
+    return new Date(dateStr).toLocaleDateString('fr-FR');
+};
 </script>
 </body>
 </html>

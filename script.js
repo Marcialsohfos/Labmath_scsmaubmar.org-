@@ -1,4 +1,4 @@
-// ===== LAB_MATH - CORE SCRIPT (CORRIGÉ) =====
+// ===== LAB_MATH - CORE SCRIPT (VERSION COMPLÈTE CORRIGÉE) =====
 
 // 1. CONFIGURATION DES DONNÉES
 const DATA_FILE = 'data.json';
@@ -35,57 +35,32 @@ function truncateText(text, maxLength = 100) {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
-function downloadData() {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
-    const downloadAnchorNode = document.createElement('a');
-    downloadAnchorNode.setAttribute("href", dataStr);
-    downloadAnchorNode.setAttribute("download", "data.json");
-    document.body.appendChild(downloadAnchorNode);
-    downloadAnchorNode.click();
-    downloadAnchorNode.remove();
-    showAlert('success', 'Fichier prêt ! Remplacez le data.json actuel par celui-ci.');
-}
+// ===== CHARGEMENT DES DONNÉES (LOGIQUE CORRIGÉE) =====
 
-// ===== CHARGEMENT HYBRIDE DES DONNÉES (CRUCIAL) =====
 async function loadAllAppData() {
-    // 1. Tenter de charger depuis le LocalStorage (modifs Admin)
-    const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (localData) {
-        console.log("Données chargées depuis le cache local");
-        return JSON.parse(localData);
-    }
-
-    // 2. Sinon, charger le fichier JSON
     try {
-        const response = await fetch(DATA_FILE);
-        if (!response.ok) throw new Error("Fichier JSON introuvable");
+        // On force le rafraîchissement depuis le serveur avec ?t=
+        const response = await fetch(DATA_FILE + '?t=' + Date.now());
+        if (!response.ok) throw new Error("Erreur serveur");
+        
         const data = await response.json();
+        
+        // On synchronise le cache local avec les nouvelles données du serveur
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+        console.log("Système: Données fraîches récupérées du serveur.");
         return data;
     } catch (error) {
-        console.error("Erreur de chargement des données:", error);
-        return { activites: [], realisations: [], annonces: [], offres: [] };
+        console.warn("Système: Serveur injoignable ou fichier absent, lecture du cache local...");
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (localData) {
+            return JSON.parse(localData);
+        }
+        return { activites: [], realisations: [], annonces: [], offres: [], messages: [] };
     }
 }
 
-//=============SYNCHRONISATION DES DONNEES===================
+// ===== AFFICHAGE DES ACTIVITÉS (SITE PUBLIC) =====
 
-async function loadData() {
-    try {
-        // Le paramètre ?t= + Date.now() génère un nombre unique à chaque seconde
-        // Cela force le navigateur à ignorer sa mémoire cache.
-        const response = await fetch('data.json?t=' + Date.now());
-        
-        if (!response.ok) throw new Error('Erreur de chargement');
-        
-        const data = await response.json();
-        // ... suite de votre code pour afficher les données ...
-        renderActivities(data.activites); 
-    } catch (error) {
-        console.error("Erreur:", error);
-    }
-}
-
-// ===== AFFICHAGE DES ACTIVITÉS SUR LE SITE PUBLIC =====
 async function renderActivites() {
     const container = document.getElementById('activites-container');
     if (!container) return;
@@ -93,11 +68,11 @@ async function renderActivites() {
     const data = await loadAllAppData();
     const activites = data.activites || [];
 
-    // Filtrer pour ne montrer que les publiées
+    // Filtrage strict des éléments publiés
     const publiees = activites.filter(a => a.est_publie === true || a.est_publie === "true");
 
     if (publiees.length === 0) {
-        container.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Aucune activité publiée pour le moment.</p>';
+        container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucune activité publiée pour le moment.</p>';
         return;
     }
 
@@ -113,115 +88,29 @@ async function renderActivites() {
     `).join('');
 }
 
+// ===== GESTION DES MESSAGES (ADMIN) =====
 
-// ===== INITIALISATION =====
-document.addEventListener('DOMContentLoaded', async () => {
-    createMathBackground();
-    
-    // Année automatique
-    const yearEl = document.getElementById('currentYear');
-    if (yearEl) yearEl.textContent = new Date().getFullYear();
-
-    // Détecter la page et charger le contenu
-    if (document.getElementById('activites-container')) renderActivites();
-    
-    // Ajoutez ici les fonctions pour realisations, annonces, etc.
-    // if (document.getElementById('realisations-container')) renderRealisations();
-});
-
-// ===== FONCTIONS POUR L'ADMIN (ACCESSIBLES PARTOUT) =====
-
-window.showAlert = function(type, message) {
-    const alert = document.createElement('div');
-    alert.className = `alert alert-${type}`;
-    alert.textContent = message;
-    document.body.appendChild(alert);
-    setTimeout(() => alert.remove(), 3000);
-};
-
-window.saveDataToStorage = function(data) {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
-    console.log("Système: Données synchronisées localement.");
-};
-// Fonction pour afficher les messages dans l'admin
 function renderAdminMessages() {
     const container = document.getElementById('messages-list');
     if (!container) return;
 
-    const data = JSON.parse(localStorage.getItem('labmath_data')) || { messages: [] };
+    const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { messages: [] };
     const messages = data.messages || [];
 
-    if (messages.length === 0) {
-        container.innerHTML = '<p>Aucun message reçu.</p>';
-        return;
-    }
-
-    // On trie du plus récent au plus ancien
-    container.innerHTML = messages.reverse().map(msg => `
-        <div class="math-card ${msg.lu ? '' : 'unread'}" style="border-left: 4px solid ${msg.lu ? '#444' : 'var(--primary)'}">
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                <small>${new Date(msg.date).toLocaleString('fr-FR')}</small>
-                ${!msg.lu ? '<span class="badge">Nouveau</span>' : ''}
-            </div>
-            <h4>${msg.sujet}</h4>
-            <p><strong>De:</strong> ${msg.nom} (${msg.email})</p>
-            <p style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
-                ${msg.contenu}
-            </p>
-            <div class="admin-actions">
-                <button onclick="markAsRead(${msg.id})" class="btn-sm">
-                    ${msg.lu ? 'Marquer non lu' : 'Marquer comme lu'}
-                </button>
-                <a href="mailto:${msg.email}?subject=Re: ${msg.sujet}" class="btn-sm btn-primary">
-                    <i class="fas fa-reply"></i> Répondre par Email
-                </a>
-                <button onclick="deleteMessage(${msg.id})" class="btn-sm btn-danger">Supprimer</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Marquer comme lu
-window.markAsRead = function(id) {
-    let data = JSON.parse(localStorage.getItem('labmath_data'));
-    const index = data.messages.findIndex(m => m.id === id);
-    if (index !== -1) {
-        data.messages[index].lu = !data.messages[index].lu;
-        localStorage.setItem('labmath_data', JSON.stringify(data));
-        renderAdminMessages();
-    }
-};
-
-// Supprimer un message
-window.deleteMessage = function(id) {
-    if(confirm('Supprimer ce message définitivement ?')) {
-        let data = JSON.parse(localStorage.getItem('labmath_data'));
-        data.messages = data.messages.filter(m => m.id !== id);
-        localStorage.setItem('labmath_data', JSON.stringify(data));
-        renderAdminMessages();
-    }
-};
-
-// --- GESTION DES MESSAGES ---
-
-function renderAdminMessages() {
-    const container = document.getElementById('messages-list');
-    const data = JSON.parse(localStorage.getItem('labmath_data')) || { messages: [] };
-    const messages = data.messages || [];
-
-    // Mise à jour des compteurs dans les stats
+    // Mise à jour des compteurs statistiques
     const nouveaux = messages.filter(m => !m.lu).length;
-    document.getElementById('stat-messages').textContent = messages.length;
-    document.getElementById('stat-messages-new').textContent = `${nouveaux} nouveaux`;
+    const statMsg = document.getElementById('stat-messages');
+    const statNew = document.getElementById('stat-messages-new');
+    if (statMsg) statMsg.textContent = messages.length;
+    if (statNew) statNew.textContent = `${nouveaux} nouveaux`;
 
     if (messages.length === 0) {
         container.innerHTML = '<p style="text-align: center; opacity: 0.5;">Aucun message reçu.</p>';
         return;
     }
 
-    // Affichage des messages (du plus récent au plus ancien)
     container.innerHTML = [...messages].reverse().map(msg => `
-        <div class="math-card" style="border-left: 4px solid ${msg.lu ? 'transparent' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
+        <div class="math-card" style="border-left: 4px solid ${msg.lu ? 'rgba(255,255,255,0.1)' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <h4 style="color: var(--primary); margin-bottom: 5px;">${msg.sujet}</h4>
@@ -245,33 +134,70 @@ function renderAdminMessages() {
     `).join('');
 }
 
-// Changer l'état Lu/Non Lu
+// Actions Messages
 window.toggleRead = function(id) {
-    let data = JSON.parse(localStorage.getItem('labmath_data'));
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
     const msg = data.messages.find(m => m.id === id);
     if (msg) {
         msg.lu = !msg.lu;
-        localStorage.setItem('labmath_data', JSON.stringify(data));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
         renderAdminMessages();
     }
 };
 
-// Supprimer un message
 window.deleteMessage = function(id) {
     if(confirm('Supprimer définitivement ce message ?')) {
-        let data = JSON.parse(localStorage.getItem('labmath_data'));
+        let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
         data.messages = data.messages.filter(m => m.id !== id);
-        localStorage.setItem('labmath_data', JSON.stringify(data));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
         renderAdminMessages();
     }
 };
-// Incrémenter le compteur de visites dans le localStorage
+
+// ===== VISITES ET INITIALISATION =====
+
 function incrementVisits() {
     let visits = localStorage.getItem('labmath_visits') || 0;
     visits = parseInt(visits) + 1;
     localStorage.setItem('labmath_visits', visits);
 }
-incrementVisits();
 
-// Modifier votre fonction loadAllData pour inclure l'appel
-// Ajoutez renderAdminMessages() à l'intérieur de loadAllData()
+document.addEventListener('DOMContentLoaded', async () => {
+    createMathBackground();
+    
+    // Année automatique footer
+    const yearEl = document.getElementById('currentYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+    // Détection Page Public vs Admin
+    if (document.getElementById('activites-container')) {
+        incrementVisits(); // On ne compte les visites que sur l'index public
+        renderActivites();
+    }
+    
+    if (document.getElementById('messages-list')) {
+        renderAdminMessages();
+    }
+});
+
+// Alertes système
+window.showAlert = function(type, message) {
+    const alert = document.createElement('div');
+    alert.className = `alert alert-${type}`;
+    alert.textContent = message;
+    document.body.appendChild(alert);
+    setTimeout(() => alert.remove(), 3000);
+};
+
+// Téléchargement (Sync)
+window.downloadData = function() {
+    const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "data.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    showAlert('success', 'Fichier data.json généré. Remplacez-le sur GitHub.');
+};
