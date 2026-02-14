@@ -61,7 +61,11 @@
     <!-- Liste des activités -->
     <section class="section">
         <div class="container">
-            <div id="activites-container" class="math-grid"></div>
+            <div id="activites-container" class="math-grid">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner fa-spin"></i> Chargement des activités...
+                </div>
+            </div>
         </div>
     </section>
 
@@ -92,6 +96,92 @@
     </footer>
 
     <script src="config.js"></script>
+    <script>
+        // Fonction pour charger les activités
+        async function chargerActivites() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                const data = await response.json();
+                
+                const container = document.getElementById('activites-container');
+                
+                if (data.activites && data.activites.length > 0) {
+                    let html = '';
+                    
+                    data.activites.forEach(activite => {
+                        html += `
+                            <div class="math-card" data-category="${activite.categorie || 'general'}">
+                                <div class="math-card-header">
+                                    <div class="math-icon">∑</div>
+                                    <h3>${activite.titre}</h3>
+                                </div>
+                                <div class="math-card-body">
+                                    <p class="math-date">
+                                        <i class="far fa-calendar-alt"></i> 
+                                        ${new Date(activite.date_creation).toLocaleDateString('fr-FR', {
+                                            year: 'numeric',
+                                            month: 'long',
+                                            day: 'numeric'
+                                        })}
+                                    </p>
+                                    <p class="math-description">${activite.description}</p>
+                                    ${activite.categorie ? `
+                                        <span class="math-tag">${activite.categorie}</span>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = `
+                        <div class="aucune-activite" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">∑</div>
+                            <h2 style="margin-bottom: 1rem;">Aucune activité pour le moment</h2>
+                            <p style="color: #666;">Les activités scientifiques seront publiées prochainement</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Erreur chargement activités:', error);
+                document.getElementById('activites-container').innerHTML = `
+                    <div class="erreur-chargement" style="text-align: center; grid-column: 1/-1; padding: 4rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #dc3545; margin-bottom: 1rem;"></i>
+                        <p>Erreur de chargement des activités</p>
+                        <button onclick="chargerActivites()" class="btn btn-outline" style="margin-top: 1rem;">
+                            <i class="fas fa-redo"></i> Réessayer
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Gestion des filtres
+        document.addEventListener('DOMContentLoaded', function() {
+            chargerActivites();
+            
+            // Ajouter les événements de filtre
+            const filterButtons = document.querySelectorAll('[data-filter]');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    filterButtons.forEach(btn => btn.classList.remove('active-filter'));
+                    this.classList.add('active-filter');
+                    
+                    const filter = this.dataset.filter;
+                    const cards = document.querySelectorAll('.math-card');
+                    
+                    cards.forEach(card => {
+                        if (filter === 'all' || card.dataset.category === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        });
+    </script>
     <script src="script.js"></script>
 </body>
 </html>

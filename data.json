@@ -1,62 +1,22 @@
 {
+  "compteurs": {
+    "activites": 0,
+    "realisations": 0,
+    "offres": 0,
+    "annonces": 0,
+    "total": 0
+  },
   "activites": [
     {
-      "sync_id": "1",
-      "titre": "Séminaire sur l'IA et les Mathématiques Appliquées",
-      "description": "Présentation des dernières avancées en intelligence artificielle et leurs fondements mathématiques.",
-      "contenu": "Lors de ce séminaire, nos chercheurs ont présenté les résultats de leurs travaux sur les réseaux de neurones profonds...",
-      "image_url": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb",
-      "auteur": "Dr. Marie Mbarga",
-      "date_creation": "2025-03-15T10:30:00",
-      "est_publie": true,
-      "categorie": "seminaire"
-    },
-    {
-      "sync_id": "2",
-      "titre": "Publication dans Journal of Computational Mathematics",
-      "description": "Article sur les nouvelles méthodes de résolution d'équations différentielles partielles.",
-      "contenu": "Notre équipe a publié un article intitulé 'Adaptive Finite Element Methods for Nonlinear PDEs'...",
-      "image_url": "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c",
-      "auteur": "Prof. Jean Nkou",
-      "date_creation": "2025-02-10T09:15:00",
-      "est_publie": true,
-      "categorie": "publication"
+      "id": 1,
+      "titre": "Séminaire d'analyse numérique",
+      "description": "Présentation des dernières avancées en analyse numérique",
+      "categorie": "seminaire",
+      "date_creation": "2025-02-20T10:30:00"
     }
   ],
-  "realisations": [
-    {
-      "sync_id": "1",
-      "titre": "Plateforme de prédiction des récoltes",
-      "description": "Développement d'un modèle prédictif pour l'agriculture au Cameroun.",
-      "image_url": "https://images.unsplash.com/photo-1593113598332-2888091c6c85",
-      "categorie": "Recherche",
-      "date_realisation": "2024-11-15",
-      "date_creation": "2024-11-20T10:00:00"
-    }
-  ],
-  "annonces": [
-    {
-      "sync_id": "1",
-      "titre": "Appel à candidatures: Post-doctorat",
-      "contenu": "Le laboratoire recrute un chercheur post-doctoral pour un projet de 2 ans.",
-      "type_annonce": "info",
-      "date_debut": "2025-03-01T00:00:00",
-      "date_fin": "2025-06-30T23:59:59",
-      "date_creation": "2025-03-01T08:00:00",
-      "est_active": true
-    }
-  ],
-  "offres": [
-    {
-      "sync_id": "1",
-      "titre": "Ingénieur en Data Science",
-      "description": "Nous recherchons un ingénieur en data science pour rejoindre notre équipe R&D.",
-      "type_offre": "emploi",
-      "lieu": "Douala",
-      "date_limite": "2025-05-15",
-      "date_creation": "2025-03-01T10:00:00",
-      "est_active": true
-    }
-  ],
-  "last_update": "2025-03-20T15:30:00"
+  "realisations": [],
+  "offres": [],
+  "annonces": [],
+  "messages": []
 }
