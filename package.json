@@ -1,0 +1,8 @@
+{
+  "name": "labmath-admin",
+  "version": "1.0.0",
+  "description": "Site Lab_Math avec fonctions Netlify",
+  "dependencies": {
+    "nodemailer": "^6.9.7"
+  }
+}

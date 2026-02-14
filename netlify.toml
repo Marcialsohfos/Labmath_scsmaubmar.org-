@@ -1,4 +1,3 @@
-# netlify.toml
 [build]
   command = "echo 'No build required'"
   functions = "netlify/functions"
