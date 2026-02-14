@@ -533,606 +533,602 @@
         </div>
     </div>
 
-    <script src="config.js"></script>
-    <script src="script.js"></script>
-    <script>
-        // ============================================
-        // ADMIN - GESTION COMPLÈTE DES DONNÉES
-        // ============================================
-        
-        // Vérification authentification
-        if (!localStorage.getItem('labmath_admin')) {
-            window.location.href = 'login.html';
-        }
-
-        // Données en cache
-        let appData = {
-            activites: [],
-            realisations: [],
-            annonces: [],
-            offres: []
-        };
-
-        // Initialisation
-        document.addEventListener('DOMContentLoaded', () => {
-            loadAllData();
-        });
-
-        // ============================================
-        // CHARGEMENT DES DONNÉES
-        // ============================================
-        
-        async function loadAllData() {
-            try {
-                // Charger depuis data.json
-                const response = await fetch('data.json');
-                const data = await response.json();
-                
-                appData = {
-                    activites: data.activites || [],
-                    realisations: data.realisations || [],
-                    annonces: data.annonces || [],
-                    offres: data.offres || []
-                };
-                
-                updateAllTables();
-                updateStats();
-                
-                // Sauvegarder dans localStorage pour les modifications
-                localStorage.setItem('labmath_data', JSON.stringify(appData));
-                
-            } catch (error) {
-                console.error('Erreur chargement:', error);
-                showAlert('error', 'Erreur de chargement des données');
-            }
-        }
-
-        // ============================================
-        // MISE À JOUR DES TABLEAUX
-        // ============================================
-        
-        function updateAllTables() {
-            updateActivitesTable();
-            updateRealisationsTable();
-            updateAnnoncesTable();
-            updateOffresTable();
-        }
-
-        function updateActivitesTable() {
-            const tbody = document.getElementById('activites-table-body');
-            const activites = appData.activites || [];
-            
-            if (activites.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune activité</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = activites.map(a => `
-                <tr>
-                    <td style="font-weight: 600;">${a.titre}</td>
-                    <td>${a.auteur || 'Admin'}</td>
-                    <td>${formatDate(a.date_creation)}</td>
-                    <td>
-                        <span class="status-badge ${a.est_publie ? 'status-published' : 'status-draft'}">
-                            ${a.est_publie ? 'Publié' : 'Brouillon'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sync-status sync-success"></span>
-                    </td>
-                    <td>
-                        <button class="action-btn edit" onclick="openModal('activite', '${a.sync_id}')" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteItem('activite', '${a.sync_id}')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateRealisationsTable() {
-            const tbody = document.getElementById('realisations-table-body');
-            const realisations = appData.realisations || [];
-            
-            if (realisations.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Aucune réalisation</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = realisations.map(r => `
-                <tr>
-                    <td style="font-weight: 600;">${r.titre}</td>
-                    <td><span class="status-badge status-published">${r.categorie || 'Projet'}</span></td>
-                    <td>${formatDate(r.date_realisation)}</td>
-                    <td>
-                        <span class="sync-status sync-success"></span>
-                    </td>
-                    <td>
-                        <button class="action-btn edit" onclick="openModal('realisation', '${r.sync_id}')" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteItem('realisation', '${r.sync_id}')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateAnnoncesTable() {
-            const tbody = document.getElementById('annonces-table-body');
-            const annonces = appData.annonces || [];
-            
-            if (annonces.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune annonce</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = annonces.map(a => `
-                <tr>
-                    <td style="font-weight: 600;">${a.titre}</td>
-                    <td>${a.type_annonce || 'info'}</td>
-                    <td>${formatDate(a.date_debut)} - ${formatDate(a.date_fin)}</td>
-                    <td>
-                        <span class="status-badge ${a.est_active ? 'status-active' : 'status-inactive'}">
-                            ${a.est_active ? 'Active' : 'Inactive'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sync-status sync-success"></span>
-                    </td>
-                    <td>
-                        <button class="action-btn edit" onclick="openModal('annonce', '${a.sync_id}')" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteItem('annonce', '${a.sync_id}')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        function updateOffresTable() {
-            const tbody = document.getElementById('offres-table-body');
-            const offres = appData.offres || [];
-            
-            if (offres.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aucune offre</td></tr>';
-                return;
-            }
-            
-            tbody.innerHTML = offres.map(o => `
-                <tr>
-                    <td style="font-weight: 600;">${o.titre}</td>
-                    <td>${o.type_offre || 'autre'}</td>
-                    <td>${o.lieu || 'Non spécifié'}</td>
-                    <td>${formatDate(o.date_limite)}</td>
-                    <td>
-                        <span class="status-badge ${o.est_active ? 'status-active' : 'status-inactive'}">
-                            ${o.est_active ? 'Active' : 'Inactive'}
-                        </span>
-                    </td>
-                    <td>
-                        <span class="sync-status sync-success"></span>
-                    </td>
-                    <td>
-                        <button class="action-btn edit" onclick="openModal('offre', '${o.sync_id}')" title="Modifier">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="action-btn delete" onclick="deleteItem('offre', '${o.sync_id}')" title="Supprimer">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        // ============================================
-        // STATISTIQUES
-        // ============================================
-        
-        function updateStats() {
-            document.getElementById('stat-activites').textContent = appData.activites.length;
-            document.getElementById('stat-activites-pub').textContent = 
-                `${appData.activites.filter(a => a.est_publie).length} publiées`;
-            
-            document.getElementById('stat-realisations').textContent = appData.realisations.length;
-            
-            document.getElementById('stat-annonces').textContent = appData.annonces.length;
-            document.getElementById('stat-annonces-active').textContent = 
-                `${appData.annonces.filter(a => a.est_active).length} actives`;
-            
-            document.getElementById('stat-offres').textContent = appData.offres.length;
-            document.getElementById('stat-offres-active').textContent = 
-                `${appData.offres.filter(o => o.est_active).length} actives`;
-        }
-
-        // ============================================
-        // GESTION DU MODAL
-        // ============================================
-        
-        function openModal(type, id = null) {
-            const modal = document.getElementById('itemModal');
-            const form = document.getElementById('itemForm');
-            
-            // Réinitialiser le formulaire
-            form.reset();
-            document.getElementById('itemType').value = type;
-            document.getElementById('itemId').value = id || '';
-            
-            // Configurer le titre
-            const titles = {
-                'activite': 'Activité',
-                'realisation': 'Réalisation',
-                'annonce': 'Annonce',
-                'offre': 'Offre'
-            };
-            document.getElementById('modalTitle').textContent = id ? `Modifier ${titles[type]}` : `Nouvelle ${titles[type]}`;
-            
-            // Afficher/masquer les champs selon le type
-            document.getElementById('contenu-group').style.display = type === 'activite' ? 'block' : 'none';
-            
-            // Configurer les champs dynamiques
-            configureDynamicFields(type);
-            
-            // Si modification, charger les données
-            if (id) {
-                loadItemData(type, id);
-            }
-            
-            modal.classList.add('active');
-        }
-
-        function configureDynamicFields(type) {
-            const container = document.getElementById('dynamicFields');
-            let html = '';
-            
-            switch(type) {
-                case 'realisation':
-                    html = `
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Catégorie</label>
-                                <select class="form-control" id="categorie" name="categorie">
-                                    <option value="Recherche">Recherche</option>
-                                    <option value="Projet">Projet</option>
-                                    <option value="Publication">Publication</option>
-                                    <option value="Innovation">Innovation</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Date de réalisation</label>
-                                <input type="date" class="form-control" id="date_realisation" name="date_realisation">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'annonce':
-                    html = `
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Type d'annonce</label>
-                                <select class="form-control" id="type_annonce" name="type_annonce">
-                                    <option value="info">Information</option>
-                                    <option value="urgence">Urgence</option>
-                                    <option value="evenement">Événement</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Date de début</label>
-                                <input type="datetime-local" class="form-control" id="date_debut" name="date_debut">
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Date de fin</label>
-                                <input type="datetime-local" class="form-control" id="date_fin" name="date_fin">
-                            </div>
-                        </div>
-                    `;
-                    break;
-                    
-                case 'offre':
-                    html = `
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label class="form-label">Type d'offre</label>
-                                <select class="form-control" id="type_offre" name="type_offre">
-                                    <option value="emploi">Emploi</option>
-                                    <option value="stage">Stage</option>
-                                    <option value="formation">Formation</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Lieu</label>
-                                <input type="text" class="form-control" id="lieu" name="lieu" placeholder="Yaoundé, Douala, ...">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Date limite</label>
-                            <input type="date" class="form-control" id="date_limite" name="date_limite">
-                        </div>
-                    `;
-                    break;
-            }
-            
-            container.innerHTML = html;
-            
-            // Mettre à jour le label du statut
-            const statusLabels = {
-                'activite': 'Publié',
-                'realisation': 'Visible',
-                'annonce': 'Active',
-                'offre': 'Active'
-            };
-            document.getElementById('statusLabel').textContent = statusLabels[type] || 'Publié / Actif';
-        }
-
-        function loadItemData(type, id) {
-            const items = appData[`${type}s`] || appData[`${type}s`] || [];
-            const item = items.find(i => i.sync_id === id);
-            
-            if (!item) return;
-            
-            document.getElementById('titre').value = item.titre || '';
-            document.getElementById('description').value = item.description || '';
-            document.getElementById('contenu').value = item.contenu || '';
-            document.getElementById('image_url').value = item.image_url || '';
-            document.getElementById('est_publie').checked = item.est_publie !== false;
-            
-            // Champs spécifiques
-            if (type === 'realisation') {
-                document.getElementById('categorie').value = item.categorie || 'Projet';
-                if (item.date_realisation) {
-                    document.getElementById('date_realisation').value = item.date_realisation;
-                }
-            } else if (type === 'annonce') {
-                document.getElementById('type_annonce').value = item.type_annonce || 'info';
-                if (item.date_debut) {
-                    document.getElementById('date_debut').value = item.date_debut.slice(0, 16);
-                }
-                if (item.date_fin) {
-                    document.getElementById('date_fin').value = item.date_fin.slice(0, 16);
-                }
-                document.getElementById('est_publie').checked = item.est_active !== false;
-            } else if (type === 'offre') {
-                document.getElementById('type_offre').value = item.type_offre || 'autre';
-                document.getElementById('lieu').value = item.lieu || '';
-                if (item.date_limite) {
-                    document.getElementById('date_limite').value = item.date_limite;
-                }
-                document.getElementById('est_publie').checked = item.est_active !== false;
-            }
-            
-            // Aperçu image
-            if (item.image_url) {
-                const preview = document.getElementById('imagePreview');
-                preview.innerHTML = `<img src="${item.image_url}" alt="Preview">`;
-            }
-        }
-
-        function closeModal() {
-            document.getElementById('itemModal').classList.remove('active');
-        }
-
-        // ============================================
-        // SAUVEGARDE DES DONNÉES
-        // ============================================
-        
-        async function saveItem(event) {
-            event.preventDefault();
-            
-            const type = document.getElementById('itemType').value;
-            const id = document.getElementById('itemId').value || generateId();
-            
-            // Construire l'objet
-            const item = {
-                sync_id: id,
-                titre: document.getElementById('titre').value,
-                description: document.getElementById('description').value,
-                image_url: document.getElementById('image_url').value,
-                date_creation: new Date().toISOString()
-            };
-            
-            // Ajouter les champs spécifiques
-            if (type === 'activite') {
-                item.contenu = document.getElementById('contenu').value;
-                item.auteur = 'Admin';
-                item.est_publie = document.getElementById('est_publie').checked;
-            } else if (type === 'realisation') {
-                item.categorie = document.getElementById('categorie').value;
-                item.date_realisation = document.getElementById('date_realisation').value;
-            } else if (type === 'annonce') {
-                item.contenu = document.getElementById('description').value;
-                item.type_annonce = document.getElementById('type_annonce').value;
-                item.date_debut = document.getElementById('date_debut').value;
-                item.date_fin = document.getElementById('date_fin').value;
-                item.est_active = document.getElementById('est_publie').checked;
-            } else if (type === 'offre') {
-                item.type_offre = document.getElementById('type_offre').value;
-                item.lieu = document.getElementById('lieu').value;
-                item.date_limite = document.getElementById('date_limite').value;
-                item.est_active = document.getElementById('est_publie').checked;
-            }
-            
-            // Sauvegarder
-            await saveItemToData(item, type, id);
-            
-            closeModal();
-            await loadAllData();
-            showAlert('success', `${getTypeLabel(type)} ${id ? 'modifié' : 'créé'} avec succès !`);
-        }
-
-        async function saveItemToData(item, type, id) {
-            const key = `${type}s`;
-            if (!appData[key]) appData[key] = [];
-            
-            const index = appData[key].findIndex(i => i.sync_id === id);
-            
-            if (index !== -1) {
-                appData[key][index] = { ...appData[key][index], ...item };
-            } else {
-                appData[key].push(item);
-            }
-            
-            // Sauvegarder dans data.json
-            await saveToDataJson();
-        }
-
-        // ============================================
-        // SUPPRESSION
-        // ============================================
-        
-        async function deleteItem(type, id) {
-            if (!confirm(`Êtes-vous sûr de vouloir supprimer cet élément ?`)) return;
-            
-            const key = `${type}s`;
-            appData[key] = appData[key].filter(i => i.sync_id !== id);
-            
-            await saveToDataJson();
-            await loadAllData();
-            showAlert('success', 'Élément supprimé avec succès !');
-        }
-
-        // ============================================
-        // SYNCHRONISATION
-        // ============================================
-        
-        async function syncAll() {
-            showAlert('info', 'Synchronisation en cours...');
-            await saveToDataJson();
-            showAlert('success', 'Synchronisation terminée !');
-        }
-
-        // ============================================
-        // UTILITAIRES
-        // ============================================
-        
-        async function saveToDataJson() {
-            try {
-                // Sauvegarder dans localStorage
-                localStorage.setItem('labmath_data', JSON.stringify(appData));
-                
-                // Sauvegarder dans data.json (simulé)
-                const data = {
-                    activites: appData.activites,
-                    realisations: appData.realisations,
-                    annonces: appData.annonces,
-                    offres: appData.offres,
-                    last_update: new Date().toISOString()
-                };
-                
-                // Afficher dans la console (en attendant l'API)
-                console.log('📁 Données sauvegardées:', data);
-                
-                return true;
-            } catch (error) {
-                console.error('Erreur sauvegarde:', error);
-                return false;
-            }
-        }
-
-        function generateId() {
-            return Date.now().toString(36) + Math.random().toString(36).substr(2);
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return 'N/A';
-            const date = new Date(dateString);
-            return date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
-        }
-
-        function getTypeLabel(type) {
-            const labels = {
-                'activite': 'Activité',
-                'realisation': 'Réalisation',
-                'annonce': 'Annonce',
-                'offre': 'Offre'
-            };
-            return labels[type] || type;
-        }
-
-        function switchTab(tabName) {
-            // Cacher tous les tabs
-            document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            
-            // Afficher le tab sélectionné
-            document.getElementById(`tab-${tabName}`).classList.add('active');
-            event.target.classList.add('active');
-        }
-
-        function logout() {
-            localStorage.removeItem('labmath_admin');
-            window.location.href = 'login.html';
-        }
-
-        function showAlert(type, message) {
-            const alert = document.createElement('div');
-            alert.className = `alert alert-${type}`;
-            alert.innerHTML = message;
-            document.body.appendChild(alert);
-            
-            setTimeout(() => alert.remove(), 3000);
-        }
-
-        // Gestion de l'upload d'image
-        document.getElementById('image_file')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const preview = document.getElementById('imagePreview');
-                    preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
-                    document.getElementById('image_url').value = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        window.openModal = openModal;
-        window.closeModal = closeModal;
-        window.saveItem = saveItem;
-        window.deleteItem = deleteItem;
-        window.syncAll = syncAll;
-        window.switchTab = switchTab;
-        window.logout = logout;
-    </script>
-
+<script src="config.js"></script>
+<script src="script.js"></script>
 <script>
+    // ============================================
+    // ADMIN - GESTION COMPLÈTE DES DONNÉES
+    // ============================================
+    
     // Vérification authentification
     if (!localStorage.getItem('labmath_admin')) {
         window.location.href = 'login.html';
     }
+
+    // Données en cache
+    let appData = {
+        activites: [],
+        realisations: [],
+        annonces: [],
+        offres: [],
+        compteurs: {
+            activites: 0,
+            realisations: 0,
+            annonces: 0,
+            offres: 0
+        }
+    };
+
+    // URL de l'API
+    const API_URL = '/.netlify/functions/data-manager';
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', () => {
+        loadAllData();
+    });
+
+    // ============================================
+    // CHARGEMENT DES DONNÉES
+    // ============================================
     
-    // Gestionnaire pour le bouton de déconnexion
+    async function loadAllData() {
+        try {
+            // Charger depuis l'API
+            const response = await fetch(API_URL);
+            const data = await response.json();
+            
+            appData = {
+                activites: data.activites || [],
+                realisations: data.realisations || [],
+                annonces: data.annonces || [],
+                offres: data.offres || [],
+                compteurs: data.compteurs || {
+                    activites: (data.activites || []).length,
+                    realisations: (data.realisations || []).length,
+                    annonces: (data.annonces || []).length,
+                    offres: (data.offres || []).length
+                }
+            };
+            
+            updateAllTables();
+            updateStats();
+            
+        } catch (error) {
+            console.error('Erreur chargement:', error);
+            showAlert('error', 'Erreur de chargement des données');
+        }
+    }
+
+    // ============================================
+    // MISE À JOUR DES TABLEAUX
+    // ============================================
+    
+    function updateAllTables() {
+        updateActivitesTable();
+        updateRealisationsTable();
+        updateAnnoncesTable();
+        updateOffresTable();
+    }
+
+    function updateActivitesTable() {
+        const tbody = document.getElementById('activites-table-body');
+        const activites = appData.activites || [];
+        
+        if (activites.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune activité</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = activites.map((a, index) => `
+            <tr>
+                <td style="font-weight: 600;">${a.titre || 'Sans titre'}</td>
+                <td>${a.auteur || 'Admin'}</td>
+                <td>${formatDate(a.date_creation)}</td>
+                <td>
+                    <span class="status-badge ${a.est_publie ? 'status-published' : 'status-draft'}">
+                        ${a.est_publie ? 'Publié' : 'Brouillon'}
+                    </span>
+                </td>
+                <td>
+                    <span class="sync-status sync-success"></span>
+                </td>
+                <td>
+                    <button class="action-btn edit" onclick="openModal('activite', ${index})" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteItem('activites', ${index})" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateRealisationsTable() {
+        const tbody = document.getElementById('realisations-table-body');
+        const realisations = appData.realisations || [];
+        
+        if (realisations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">Aucune réalisation</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = realisations.map((r, index) => `
+            <tr>
+                <td style="font-weight: 600;">${r.titre || 'Sans titre'}</td>
+                <td><span class="status-badge status-published">${r.categorie || 'Projet'}</span></td>
+                <td>${formatDate(r.date_realisation || r.date_creation)}</td>
+                <td>
+                    <span class="sync-status sync-success"></span>
+                </td>
+                <td>
+                    <button class="action-btn edit" onclick="openModal('realisation', ${index})" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteItem('realisations', ${index})" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateAnnoncesTable() {
+        const tbody = document.getElementById('annonces-table-body');
+        const annonces = appData.annonces || [];
+        
+        if (annonces.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">Aucune annonce</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = annonces.map((a, index) => `
+            <tr>
+                <td style="font-weight: 600;">${a.titre || 'Sans titre'}</td>
+                <td>${a.type_annonce || 'info'}</td>
+                <td>${formatDate(a.date_debut)} - ${formatDate(a.date_fin)}</td>
+                <td>
+                    <span class="status-badge ${a.est_active ? 'status-active' : 'status-inactive'}">
+                        ${a.est_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td>
+                    <span class="sync-status sync-success"></span>
+                </td>
+                <td>
+                    <button class="action-btn edit" onclick="openModal('annonce', ${index})" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteItem('annonces', ${index})" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    function updateOffresTable() {
+        const tbody = document.getElementById('offres-table-body');
+        const offres = appData.offres || [];
+        
+        if (offres.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align: center;">Aucune offre</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = offres.map((o, index) => `
+            <tr>
+                <td style="font-weight: 600;">${o.titre || 'Sans titre'}</td>
+                <td>${o.type_offre || 'autre'}</td>
+                <td>${o.lieu || 'Non spécifié'}</td>
+                <td>${formatDate(o.date_limite)}</td>
+                <td>
+                    <span class="status-badge ${o.est_active ? 'status-active' : 'status-inactive'}">
+                        ${o.est_active ? 'Active' : 'Inactive'}
+                    </span>
+                </td>
+                <td>
+                    <span class="sync-status sync-success"></span>
+                </td>
+                <td>
+                    <button class="action-btn edit" onclick="openModal('offre', ${index})" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="action-btn delete" onclick="deleteItem('offres', ${index})" title="Supprimer">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // ============================================
+    // STATISTIQUES
+    // ============================================
+    
+    function updateStats() {
+        document.getElementById('stat-activites').textContent = appData.activites.length;
+        document.getElementById('stat-activites-pub').textContent = 
+            `${appData.activites.filter(a => a.est_publie).length} publiées`;
+        
+        document.getElementById('stat-realisations').textContent = appData.realisations.length;
+        
+        document.getElementById('stat-annonces').textContent = appData.annonces.length;
+        document.getElementById('stat-annonces-active').textContent = 
+            `${appData.annonces.filter(a => a.est_active).length} actives`;
+        
+        document.getElementById('stat-offres').textContent = appData.offres.length;
+        document.getElementById('stat-offres-active').textContent = 
+            `${appData.offres.filter(o => o.est_active).length} actives`;
+    }
+
+    // ============================================
+    // GESTION DU MODAL
+    // ============================================
+    
+    function openModal(type, index = null) {
+        const modal = document.getElementById('itemModal');
+        const form = document.getElementById('itemForm');
+        
+        // Réinitialiser le formulaire
+        form.reset();
+        document.getElementById('itemType').value = type;
+        document.getElementById('itemIndex').value = index !== null ? index : '';
+        
+        // Configurer le titre
+        const titles = {
+            'activite': 'Activité',
+            'realisation': 'Réalisation',
+            'annonce': 'Annonce',
+            'offre': 'Offre'
+        };
+        document.getElementById('modalTitle').textContent = index !== null ? `Modifier ${titles[type]}` : `Nouvelle ${titles[type]}`;
+        
+        // Afficher/masquer les champs selon le type
+        document.getElementById('contenu-group').style.display = type === 'activite' ? 'block' : 'none';
+        
+        // Configurer les champs dynamiques
+        configureDynamicFields(type);
+        
+        // Si modification, charger les données
+        if (index !== null) {
+            loadItemData(type, index);
+        }
+        
+        modal.classList.add('active');
+    }
+
+    function configureDynamicFields(type) {
+        const container = document.getElementById('dynamicFields');
+        let html = '';
+        
+        switch(type) {
+            case 'realisation':
+                html = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Catégorie</label>
+                            <select class="form-control" id="categorie">
+                                <option value="Recherche">Recherche</option>
+                                <option value="Projet">Projet</option>
+                                <option value="Publication">Publication</option>
+                                <option value="Innovation">Innovation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date de réalisation</label>
+                            <input type="date" class="form-control" id="date_realisation">
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'annonce':
+                html = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Type d'annonce</label>
+                            <select class="form-control" id="type_annonce">
+                                <option value="info">Information</option>
+                                <option value="urgence">Urgence</option>
+                                <option value="evenement">Événement</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Date de début</label>
+                            <input type="datetime-local" class="form-control" id="date_debut">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Date de fin</label>
+                            <input type="datetime-local" class="form-control" id="date_fin">
+                        </div>
+                    </div>
+                `;
+                break;
+                
+            case 'offre':
+                html = `
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Type d'offre</label>
+                            <select class="form-control" id="type_offre">
+                                <option value="emploi">Emploi</option>
+                                <option value="stage">Stage</option>
+                                <option value="formation">Formation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Lieu</label>
+                            <input type="text" class="form-control" id="lieu" placeholder="Yaoundé, Douala, ...">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Date limite</label>
+                        <input type="date" class="form-control" id="date_limite">
+                    </div>
+                `;
+                break;
+        }
+        
+        container.innerHTML = html;
+        
+        // Mettre à jour le label du statut
+        const statusLabels = {
+            'activite': 'Publié',
+            'realisation': 'Visible',
+            'annonce': 'Active',
+            'offre': 'Active'
+        };
+        document.getElementById('statusLabel').textContent = statusLabels[type] || 'Publié / Actif';
+    }
+
+    function loadItemData(type, index) {
+        const section = type + 's';
+        const item = appData[section][index];
+        
+        if (!item) return;
+        
+        document.getElementById('titre').value = item.titre || '';
+        document.getElementById('description').value = item.description || '';
+        document.getElementById('contenu').value = item.contenu || '';
+        document.getElementById('image_url').value = item.image_url || '';
+        document.getElementById('est_publie').checked = item.est_publie !== false;
+        
+        // Champs spécifiques
+        if (type === 'realisation') {
+            if (document.getElementById('categorie')) document.getElementById('categorie').value = item.categorie || 'Projet';
+            if (item.date_realisation && document.getElementById('date_realisation')) {
+                document.getElementById('date_realisation').value = item.date_realisation;
+            }
+        } else if (type === 'annonce') {
+            if (document.getElementById('type_annonce')) document.getElementById('type_annonce').value = item.type_annonce || 'info';
+            if (item.date_debut && document.getElementById('date_debut')) {
+                document.getElementById('date_debut').value = item.date_debut.slice(0, 16);
+            }
+            if (item.date_fin && document.getElementById('date_fin')) {
+                document.getElementById('date_fin').value = item.date_fin.slice(0, 16);
+            }
+            document.getElementById('est_publie').checked = item.est_active !== false;
+        } else if (type === 'offre') {
+            if (document.getElementById('type_offre')) document.getElementById('type_offre').value = item.type_offre || 'autre';
+            if (document.getElementById('lieu')) document.getElementById('lieu').value = item.lieu || '';
+            if (item.date_limite && document.getElementById('date_limite')) {
+                document.getElementById('date_limite').value = item.date_limite;
+            }
+            document.getElementById('est_publie').checked = item.est_active !== false;
+        }
+        
+        // Aperçu image
+        if (item.image_url) {
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = `<img src="${item.image_url}" alt="Preview">`;
+        }
+    }
+
+    function closeModal() {
+        document.getElementById('itemModal').classList.remove('active');
+    }
+
+    // ============================================
+    // SAUVEGARDE DES DONNÉES
+    // ============================================
+    
+    async function saveItem(event) {
+        event.preventDefault();
+        
+        const type = document.getElementById('itemType').value;
+        const index = document.getElementById('itemIndex').value;
+        const section = type + 's';
+        
+        // Construire l'objet
+        const item = {
+            titre: document.getElementById('titre').value,
+            description: document.getElementById('description').value,
+            image_url: document.getElementById('image_url').value,
+            date_creation: new Date().toISOString(),
+            est_publie: document.getElementById('est_publie').checked
+        };
+        
+        // Ajouter les champs spécifiques
+        if (type === 'activite') {
+            item.contenu = document.getElementById('contenu').value;
+            item.auteur = 'Admin';
+        } else if (type === 'realisation') {
+            item.categorie = document.getElementById('categorie')?.value;
+            item.date_realisation = document.getElementById('date_realisation')?.value;
+        } else if (type === 'annonce') {
+            item.type_annonce = document.getElementById('type_annonce')?.value;
+            item.date_debut = document.getElementById('date_debut')?.value;
+            item.date_fin = document.getElementById('date_fin')?.value;
+            item.est_active = document.getElementById('est_publie').checked;
+        } else if (type === 'offre') {
+            item.type_offre = document.getElementById('type_offre')?.value;
+            item.lieu = document.getElementById('lieu')?.value;
+            item.date_limite = document.getElementById('date_limite')?.value;
+            item.est_active = document.getElementById('est_publie').checked;
+        }
+        
+        // Si modification
+        if (index !== '') {
+            appData[section][parseInt(index)] = { ...appData[section][parseInt(index)], ...item };
+        } else {
+            // Nouvel élément
+            if (!appData[section]) appData[section] = [];
+            appData[section].push(item);
+        }
+        
+        // Mettre à jour les compteurs
+        appData.compteurs = appData.compteurs || {};
+        appData.compteurs[section] = appData[section].length;
+        
+        // Sauvegarder
+        const success = await saveToServer();
+        
+        if (success) {
+            closeModal();
+            await loadAllData();
+            showAlert('success', `${type} ${index !== '' ? 'modifié' : 'créé'} avec succès !`);
+        } else {
+            showAlert('error', 'Erreur lors de la sauvegarde');
+        }
+    }
+
+    // ============================================
+    // SUPPRESSION
+    // ============================================
+    
+    async function deleteItem(section, index) {
+        if (!confirm(`Êtes-vous sûr de vouloir supprimer cet élément ?`)) return;
+        
+        appData[section].splice(index, 1);
+        
+        // Mettre à jour les compteurs
+        appData.compteurs = appData.compteurs || {};
+        appData.compteurs[section] = appData[section].length;
+        
+        const success = await saveToServer();
+        
+        if (success) {
+            await loadAllData();
+            showAlert('success', 'Élément supprimé avec succès !');
+        } else {
+            showAlert('error', 'Erreur lors de la suppression');
+        }
+    }
+
+    // ============================================
+    // SYNCHRONISATION AVEC LE SERVEUR
+    // ============================================
+    
+    async function saveToServer() {
+        try {
+            const dataToSave = {
+                activites: appData.activites,
+                realisations: appData.realisations,
+                annonces: appData.annonces,
+                offres: appData.offres,
+                compteurs: appData.compteurs
+            };
+            
+            // Sauvegarde via l'API
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    section: 'all',
+                    data: dataToSave
+                })
+            });
+            
+            if (!response.ok) throw new Error('Erreur réseau');
+            
+            return true;
+        } catch (error) {
+            console.error('Erreur sauvegarde:', error);
+            return false;
+        }
+    }
+
+    async function syncAll() {
+        showAlert('info', 'Synchronisation en cours...');
+        const success = await saveToServer();
+        if (success) {
+            showAlert('success', 'Synchronisation terminée !');
+        } else {
+            showAlert('error', 'Erreur de synchronisation');
+        }
+    }
+
+    // ============================================
+    // UTILITAIRES
+    // ============================================
+    
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric'
+        });
+    }
+
+    function getTypeLabel(type) {
+        const labels = {
+            'activite': 'Activité',
+            'realisation': 'Réalisation',
+            'annonce': 'Annonce',
+            'offre': 'Offre'
+        };
+        return labels[type] || type;
+    }
+
+    function switchTab(tabName) {
+        // Cacher tous les tabs
+        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // Afficher le tab sélectionné
+        document.getElementById(`tab-${tabName}`).classList.add('active');
+        event.target.classList.add('active');
+    }
+
+    function logout() {
+        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
+            localStorage.removeItem('labmath_admin');
+            window.location.href = 'login.html';
+        }
+    }
+
+    // Gestion de l'upload d'image
     document.addEventListener('DOMContentLoaded', function() {
-        const logoutBtn = document.querySelector('a[href="#"][onclick="logout()"]');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                logout();
+        const imageInput = document.getElementById('image_file');
+        if (imageInput) {
+            imageInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const preview = document.getElementById('imagePreview');
+                        preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
+                        document.getElementById('image_url').value = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
     });
-    
-    // Fonction de déconnexion améliorée
-    window.logout = function() {
-        if (confirm('Êtes-vous sûr de vouloir vous déconnecter ?')) {
-            localStorage.removeItem('labmath_admin');
-            localStorage.removeItem('labmath_user');
-            sessionStorage.clear();
-            window.location.href = 'login.html';
-        }
-    };
+
+    // Exposer les fonctions globalement
+    window.openModal = openModal;
+    window.closeModal = closeModal;
+    window.saveItem = saveItem;
+    window.deleteItem = deleteItem;
+    window.syncAll = syncAll;
+    window.switchTab = switchTab;
+    window.logout = logout;
 </script>
 </body>
 </html>
