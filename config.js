@@ -101,5 +101,49 @@ if (window.location.pathname.includes('admin')) {
     console.log('🔑 API:', CONFIG.API_URL);
 };
 
+async function pushToGitHub() {
+    const statusBtn = event.currentTarget;
+    statusBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Envoi...';
+    
+    try {
+        // 1. Récupérer le contenu actuel (SHA) pour pouvoir l'écraser
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.json`;
+        
+        const getFile = await fetch(url, {
+            headers: { 'Authorization': `token ${GITHUB_CONFIG.token}` }
+        });
+        const fileData = await getFile.json();
+        const sha = fileData.sha;
+
+        // 2. Préparer les données locales
+        const content = btoa(unescape(encodeURIComponent(localStorage.getItem('labmath_data'))));
+
+        // 3. Envoyer la mise à jour
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: "Mise à jour data.json via Admin Lab_Math",
+                content: content,
+                sha: sha,
+                branch: GITHUB_CONFIG.branch || 'main'
+            })
+        });
+
+        if (response.ok) {
+            showNotice("✅ Base de données actualisée sur GitHub !");
+        } else {
+            throw new Error("Erreur lors de l'envoi");
+        }
+    } catch (error) {
+        console.error(error);
+        alert("Erreur de déploiement. Vérifiez votre configuration GitHub (Token/Repo).");
+    } finally {
+        statusBtn.innerHTML = '<i class="fab fa-github"></i> Déployer sur GitHub';
+    }
+}
 // Exporter la configuration
 window.CONFIG = CONFIG;
