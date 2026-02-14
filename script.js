@@ -67,6 +67,24 @@ async function loadAllAppData() {
     }
 }
 
+//=============SYNCHRONISATION DES DONNEES===================
+
+async function loadData() {
+    try {
+        // Le paramètre ?t= + Date.now() génère un nombre unique à chaque seconde
+        // Cela force le navigateur à ignorer sa mémoire cache.
+        const response = await fetch('data.json?t=' + Date.now());
+        
+        if (!response.ok) throw new Error('Erreur de chargement');
+        
+        const data = await response.json();
+        // ... suite de votre code pour afficher les données ...
+        renderActivities(data.activites); 
+    } catch (error) {
+        console.error("Erreur:", error);
+    }
+}
+
 // ===== AFFICHAGE DES ACTIVITÉS SUR LE SITE PUBLIC =====
 async function renderActivites() {
     const container = document.getElementById('activites-container');
@@ -94,6 +112,7 @@ async function renderActivites() {
         </div>
     `).join('');
 }
+
 
 // ===== INITIALISATION =====
 document.addEventListener('DOMContentLoaded', async () => {
