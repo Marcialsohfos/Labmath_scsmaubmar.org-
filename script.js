@@ -1,13 +1,12 @@
 // ===== LAB_MATH - ANIMATIONS MATHÉMATIQUES =====
 
 // Configuration
-const API_BASE_URL = window.location.origin;
+const API_BASE_URL = ''; // URLs relatives
 const API_ENDPOINTS = {
-    activites: `${API_BASE_URL}/.netlify/functions/data-manager`,
-    realisations: `${API_BASE_URL}/.netlify/functions/data-manager`,
-    annonces: `${API_BASE_URL}/.netlify/functions/data-manager`,
-    offres: `${API_BASE_URL}/.netlify/functions/data-manager`,
-    messages: `${API_BASE_URL}/.netlify/functions/messages`
+    activites: '/api/activites',
+    realisations: '/api/realisations',
+    annonces: '/api/annonces',
+    offres: '/api/offres'
 };
 
 // ===== GÉNÉRATEUR D'ÉQUATIONS DYNAMIQUES =====
@@ -30,9 +29,6 @@ const equations = [
 ];
 
 function createMathBackground() {
-    // Éviter de créer plusieurs fois le même fond
-    if (document.querySelector('.math-bg')) return;
-    
     const bg = document.createElement('div');
     bg.className = 'math-bg';
     
@@ -84,29 +80,24 @@ function animateNumber(element, start, end, duration = 2000) {
 // ===== CHARGEMENT DES DONNÉES =====
 async function fetchData(endpoint) {
     try {
-        const response = await fetch(endpoint + '?t=' + Date.now()); // Éviter le cache
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const response = await fetch(endpoint);
         const data = await response.json();
-        return data; // Retourne directement les données
+        return data.success ? data.data : [];
     } catch (error) {
         console.error(`Erreur ${endpoint}:`, error);
-        return null;
+        return [];
     }
 }
 
 // ===== FORMATAGE DES DATES =====
 function formatDate(dateString) {
     if (!dateString) return 'Date non spécifiée';
-    try {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        });
-    } catch (e) {
-        return dateString;
-    }
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+    });
 }
 
 // ===== TRONCATURE DE TEXTE =====
@@ -115,46 +106,140 @@ function truncateText(text, maxLength = 150) {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
-// ===== AFFICHAGE D'ALERTE =====
-function showAlert(type, message) {
-    const alertDiv = document.createElement('div');
-    alertDiv.className = `alert alert-${type}`;
-    alertDiv.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        padding: 1rem 2rem;
-        border-radius: 5px;
-        background: ${type === 'success' ? '#4CAF50' : type === 'error' ? '#f44336' : '#2196F3'};
-        color: white;
-        z-index: 9999;
-        animation: slideIn 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    `;
-    alertDiv.innerHTML = message;
-    document.body.appendChild(alertDiv);
+// ===== INITIALISATION =====
+document.addEventListener('DOMContentLoaded', () => {
+    // Fond mathématique
+    createMathBackground();
     
-    setTimeout(() => alertDiv.remove(), 3000);
+    // Année courante
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+    }
+    
+    // Animation du titre
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) {
+        const text = heroTitle.textContent;
+        typeEquation(heroTitle, text, 50);
+    }
+    
+    // Chargement des données selon la page
+    const path = window.location.pathname;
+    
+    if (path.includes('admin')) {
+        loadAdminData();
+    } else {
+        if (document.getElementById('activites-container')) loadActivites();
+        if (document.getElementById('realisations-container')) loadRealisations();
+        if (document.getElementById('annonces-container')) loadAnnonces();
+        if (document.getElementById('offres-container')) loadOffres();
+    }
+});
+
+// ===== CHARGEMENT DES ACTIVITÉS =====
+async function loadActivites() {
+    const container = document.getElementById('activites-container');
+    if (!container) return;
+    
+    container.innerHTML = '<div class="math-loader"></div><p>Chargement des activités...</p>';
+    
+    const activites = await fetchData(API_ENDPOINTS.activites);
+    
+    if (activites.length === 0) {
+        container.innerHTML = `
+            <div class="math-card" style="grid-column: 1/-1; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">∑</div>
+                <h3>Aucune activité pour le moment</h3>
+                <p>Les activités scientifiques seront publiées prochainement.</p>
+            </div>
+        `;
+        return;
+    }
+    
+    container.innerHTML = '';
+    activites.slice(0, 6).forEach(activite => {
+        const card = document.createElement('div');
+        card.className = 'math-card';
+        card.innerHTML = `
+            <div style="font-size: 2rem; color: var(--primary); margin-bottom: 1rem;">∫</div>
+            <h3 style="margin-bottom: 1rem;">${activite.titre}</h3>
+            <p style="color: rgba(224,224,255,0.7); margin-bottom: 1rem;">
+                ${truncateText(activite.description)}
+            </p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(0,255,255,0.1);">
+                <span><i class="fas fa-user"></i> ${activite.auteur || 'Lab_Math'}</span>
+                <span><i class="fas fa-calendar"></i> ${formatDate(activite.date_creation)}</span>
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
 
-// Ajouter l'animation si elle n'existe pas
-if (!document.querySelector('#alert-style')) {
-    const style = document.createElement('style');
-    style.id = 'alert-style';
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-    `;
-    document.head.appendChild(style);
+// ===== ADMIN PANEL =====
+async function loadAdminData() {
+    const stats = {
+        activites: (await fetchData(API_ENDPOINTS.activites)).length,
+        realisations: (await fetchData(API_ENDPOINTS.realisations)).length,
+        annonces: (await fetchData(API_ENDPOINTS.annonces)).length,
+        offres: (await fetchData(API_ENDPOINTS.offres)).length
+    };
+    
+    // Mise à jour des statistiques
+    Object.keys(stats).forEach(key => {
+        const el = document.getElementById(`stat-${key}`);
+        if (el) animateNumber(el, 0, stats[key], 1500);
+    });
 }
 
-// ===== FONCTIONS DE SAUVEGARDE =====
+// ===== SYNC MANUELLE =====
+async function syncWithAdmin() {
+    const adminUrl = localStorage.getItem('adminUrl') || prompt('URL de l\'admin:');
+    if (!adminUrl) return;
+    
+    localStorage.setItem('adminUrl', adminUrl);
+    
+    try {
+        const response = await fetch(`${adminUrl}/api/export`);
+        const data = await response.json();
+        
+        // Sauvegarde locale
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        
+        alert('✅ Synchronisation réussie !');
+        location.reload();
+    } catch (error) {
+        alert('❌ Erreur de synchronisation');
+    }
+}
+// ============================================
+// FONCTIONS DE SAUVEGARDE POUR L'ADMIN
+// ============================================
+
 async function saveDataToJson(data) {
     try {
+        // Sauvegarde dans localStorage
         localStorage.setItem('labmath_data', JSON.stringify(data));
+        
+        // Simuler une sauvegarde API (pour Netlify)
         console.log('💾 Données sauvegardées localement');
+        
+        // Option: Sauvegarde vers un backend (si disponible)
+        if (window.API_BACKEND_URL) {
+            const response = await fetch(`${window.API_BACKEND_URL}/api/save`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-API-Key': window.API_KEY || ''
+                },
+                body: JSON.stringify(data)
+            });
+            
+            if (response.ok) {
+                console.log('✅ Données synchronisées avec le backend');
+            }
+        }
+        
         return true;
     } catch (error) {
         console.error('❌ Erreur sauvegarde:', error);
@@ -162,6 +247,7 @@ async function saveDataToJson(data) {
     }
 }
 
+// Fonction pour charger les données depuis le localStorage
 function loadDataFromStorage() {
     const saved = localStorage.getItem('labmath_data');
     if (saved) {
@@ -174,289 +260,32 @@ function loadDataFromStorage() {
     return null;
 }
 
-// ===== CHARGEMENT DES ACTIVITÉS =====
-async function loadActivites() {
-    const container = document.getElementById('activites-container');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="math-loader"></div><p style="color: var(--primary);">Chargement des activités...</p>';
-    
-    const data = await fetchData(API_ENDPOINTS.activites);
-    const activites = data?.activites || [];
-    
-    if (activites.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <div style="font-size: 4rem; margin-bottom: 1rem; color: var(--primary);">∑</div>
-                <h3 style="margin-bottom: 1rem;">Aucune activité pour le moment</h3>
-                <p style="color: #666;">Les activités scientifiques seront publiées prochainement.</p>
-            </div>
-        `;
-        return;
+// ============================================
+// INITIALISATION GLOBALE
+// ============================================
+
+// Créer le fond mathématique au chargement
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof createMathBackground === 'function') {
+        createMathBackground();
     }
     
-    container.innerHTML = '';
-    activites.slice(0, 6).forEach(activite => {
-        const card = document.createElement('div');
-        card.className = 'math-card';
-        card.innerHTML = `
-            <div class="math-card-header">
-                <div class="math-icon">∫</div>
-                <h3 style="margin: 0;">${activite.titre || 'Sans titre'}</h3>
-            </div>
-            <div class="math-card-body">
-                <p class="math-date">
-                    <i class="far fa-calendar-alt"></i> 
-                    ${formatDate(activite.date_creation)}
-                </p>
-                <p class="math-description">${truncateText(activite.description || 'Aucune description', 100)}</p>
-            </div>
-            <div class="math-card-footer" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0,255,255,0.1);">
-                <span><i class="fas fa-user"></i> ${activite.auteur || 'Lab_Math'}</span>
-                <span><i class="fas fa-tag"></i> ${activite.categorie || 'Général'}</span>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ===== CHARGEMENT DES RÉALISATIONS =====
-async function loadRealisations() {
-    const container = document.getElementById('realisations-container');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="math-loader"></div><p style="color: var(--primary);">Chargement des réalisations...</p>';
-    
-    const data = await fetchData(API_ENDPOINTS.realisations);
-    const realisations = data?.realisations || [];
-    
-    if (realisations.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
-                <h3 style="margin-bottom: 1rem;">Aucune réalisation pour le moment</h3>
-                <p style="color: #666;">Les réalisations seront publiées prochainement.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = '';
-    realisations.slice(0, 6).forEach(realisation => {
-        const card = document.createElement('div');
-        card.className = 'math-card';
-        card.innerHTML = `
-            <div class="math-card-header">
-                <div class="math-icon">🏆</div>
-                <h3 style="margin: 0;">${realisation.titre || 'Sans titre'}</h3>
-            </div>
-            <div class="math-card-body">
-                <p class="math-date">
-                    <i class="far fa-calendar-alt"></i> 
-                    ${formatDate(realisation.date_creation)}
-                </p>
-                <p class="math-description">${truncateText(realisation.description || 'Aucune description', 100)}</p>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ===== CHARGEMENT DES ANNONCES =====
-async function loadAnnonces() {
-    const container = document.getElementById('annonces-container');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="math-loader"></div><p style="color: var(--primary);">Chargement des annonces...</p>';
-    
-    const data = await fetchData(API_ENDPOINTS.annonces);
-    const annonces = data?.annonces || [];
-    
-    if (annonces.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">📢</div>
-                <h3 style="margin-bottom: 1rem;">Aucune annonce pour le moment</h3>
-                <p style="color: #666;">Les annonces seront publiées prochainement.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = '';
-    annonces.slice(0, 6).forEach(annonce => {
-        const card = document.createElement('div');
-        card.className = 'math-card';
-        card.innerHTML = `
-            <div class="math-card-header">
-                <div class="math-icon">📢</div>
-                <h3 style="margin: 0;">${annonce.titre || 'Sans titre'}</h3>
-            </div>
-            <div class="math-card-body">
-                <p class="math-date">
-                    <i class="far fa-calendar-alt"></i> 
-                    ${formatDate(annonce.date_creation)}
-                </p>
-                <p class="math-description">${truncateText(annonce.description || 'Aucune description', 100)}</p>
-                ${annonce.est_active ? '<span style="color: #4CAF50; font-size: 0.9rem;">✓ Active</span>' : ''}
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ===== CHARGEMENT DES OFFRES =====
-async function loadOffres() {
-    const container = document.getElementById('offres-container');
-    if (!container) return;
-    
-    container.innerHTML = '<div class="math-loader"></div><p style="color: var(--primary);">Chargement des offres...</p>';
-    
-    const data = await fetchData(API_ENDPOINTS.offres);
-    const offres = data?.offres || [];
-    
-    if (offres.length === 0) {
-        container.innerHTML = `
-            <div style="grid-column: 1/-1; text-align: center; padding: 3rem;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">💼</div>
-                <h3 style="margin-bottom: 1rem;">Aucune offre pour le moment</h3>
-                <p style="color: #666;">Les offres seront publiées prochainement.</p>
-            </div>
-        `;
-        return;
-    }
-    
-    container.innerHTML = '';
-    offres.slice(0, 6).forEach(offre => {
-        const card = document.createElement('div');
-        card.className = 'math-card';
-        card.innerHTML = `
-            <div class="math-card-header">
-                <div class="math-icon">💼</div>
-                <h3 style="margin: 0;">${offre.titre || 'Sans titre'}</h3>
-            </div>
-            <div class="math-card-body">
-                <p class="math-date">
-                    <i class="far fa-calendar-alt"></i> 
-                    ${formatDate(offre.date_creation)}
-                </p>
-                <p class="math-description">${truncateText(offre.description || 'Aucune description', 100)}</p>
-                ${offre.lieu ? `<p style="margin-top: 0.5rem;"><i class="fas fa-map-marker-alt"></i> ${offre.lieu}</p>` : ''}
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-// ===== ADMIN PANEL =====
-async function loadAdminData() {
-    try {
-        const data = await fetchData(API_ENDPOINTS.activites);
-        
-        const stats = {
-            activites: data?.activites?.length || 0,
-            realisations: data?.realisations?.length || 0,
-            annonces: data?.annonces?.length || 0,
-            offres: data?.offres?.length || 0
-        };
-        
-        // Mise à jour des statistiques
-        Object.keys(stats).forEach(key => {
-            const el = document.getElementById(`stat-${key}`);
-            if (el) {
-                el.textContent = stats[key];
-                animateNumber(el, 0, stats[key], 1500);
-            }
-        });
-    } catch (error) {
-        console.error('Erreur chargement admin:', error);
-    }
-}
-
-// ===== SYNC MANUELLE =====
-async function syncWithAdmin() {
-    const adminUrl = localStorage.getItem('adminUrl') || prompt('URL de l\'admin:');
-    if (!adminUrl) return;
-    
-    localStorage.setItem('adminUrl', adminUrl);
-    
-    try {
-        showAlert('info', 'Synchronisation en cours...');
-        const response = await fetch(`${adminUrl}/api/export`);
-        const data = await response.json();
-        
-        // Sauvegarde locale
-        localStorage.setItem('labmath_data', JSON.stringify(data));
-        
-        showAlert('success', '✅ Synchronisation réussie !');
-        setTimeout(() => location.reload(), 1500);
-    } catch (error) {
-        showAlert('error', '❌ Erreur de synchronisation');
-    }
-}
-
-// ===== INITIALISATION =====
-document.addEventListener('DOMContentLoaded', () => {
-    // Fond mathématique
-    createMathBackground();
-    
-    // Année courante
-    const yearElements = document.querySelectorAll('#currentYear, .current-year, .footer-year');
+    // Mettre à jour l'année dans le footer
+    const yearElements = document.querySelectorAll('#currentYear, .current-year');
     yearElements.forEach(el => {
         el.textContent = new Date().getFullYear();
     });
-    
-    // Animation du titre (seulement sur les pages avec hero-title)
-    const heroTitle = document.querySelector('.hero-title');
-    if (heroTitle && !heroTitle.hasAttribute('data-animated')) {
-        const text = heroTitle.textContent;
-        heroTitle.setAttribute('data-animated', 'true');
-        typeEquation(heroTitle, text, 50);
-    }
-    
-    // Chargement des données selon la page
-    const path = window.location.pathname;
-    
-    if (path.includes('admin')) {
-        loadAdminData();
-    } else {
-        // Détection automatique des conteneurs
-        if (document.getElementById('activites-container')) {
-            loadActivites();
-        }
-        if (document.getElementById('realisations-container')) {
-            loadRealisations();
-        }
-        if (document.getElementById('annonces-container')) {
-            loadAnnonces();
-        }
-        if (document.getElementById('offres-container')) {
-            loadOffres();
-        }
-    }
-    
-    // Rafraîchissement périodique (optionnel)
-    if (!path.includes('admin')) {
-        // Recharger les données toutes les 60 secondes
-        setInterval(() => {
-            if (document.getElementById('activites-container')) loadActivites();
-            if (document.getElementById('realisations-container')) loadRealisations();
-            if (document.getElementById('annonces-container')) loadAnnonces();
-            if (document.getElementById('offres-container')) loadOffres();
-        }, 60000);
-    }
 });
 
-// ===== EXPORT DES FONCTIONS GLOBALES =====
+// ============================================
+// EXPORT DES FONCTIONS GLOBALES
+// ============================================
+
 window.formatDate = formatDate;
 window.truncateText = truncateText;
 window.fetchData = fetchData;
 window.showAlert = showAlert;
 window.saveDataToJson = saveDataToJson;
 window.loadDataFromStorage = loadDataFromStorage;
+// Export global
 window.syncWithAdmin = syncWithAdmin;
-window.loadActivites = loadActivites;
-window.loadRealisations = loadRealisations;
-window.loadAnnonces = loadAnnonces;
-window.loadOffres = loadOffres;
-window.loadAdminData = loadAdminData;
