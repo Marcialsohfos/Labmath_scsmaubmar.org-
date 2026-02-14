@@ -556,6 +556,9 @@
             <button class="btn btn-outline" onclick="renderAdminMessages()">
                 <i class="fas fa-sync-alt"></i> Actualiser
             </button>
+           <button class="btn btn-primary" onclick="downloadData()">
+                <i class="fas fa-download"></i> Télécharger data.json
+           </button>
         </div>
         
         <div id="messages-list" style="display: grid; gap: 1.5rem;">
@@ -963,42 +966,28 @@
 async function saveItem(event) {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const type = document.getElementById('itemType').value; // 'activite', 'offre', etc.
-    const id = document.getElementById('itemId').value;
+    const type = formData.get('type') + 's';
+    const id = formData.get('id');
+    
+    const newItem = Object.fromEntries(formData.entries());
+    newItem.sync_id = id || 'id_' + Date.now();
+    newItem.date_creation = new Date().toISOString();
+    newItem.est_publie = document.getElementById('est_publie').checked;
 
-    // Création de l'objet data
-    const newItem = {
-        sync_id: id || 'id_' + Date.now(),
-        titre: formData.get('titre'),
-        description: formData.get('description'),
-        est_publie: formData.get('est_publie') === 'true',
-        date_creation: new Date().toISOString()
-    };
-
-    // Ajout spécifique selon le type
-    if (type === 'activite') {
-        newItem.contenu = formData.get('contenu');
-        newItem.auteur = "Admin";
-    }
-
-    // 1. Mettre à jour appData (en mémoire)
-    const listName = type + 's'; // transforme 'activite' en 'activites'
     if (id) {
-        const index = appData[listName].findIndex(item => item.sync_id === id);
-        appData[listName][index] = newItem;
+        const index = appData[type].findIndex(item => item.sync_id === id);
+        appData[type][index] = newItem;
     } else {
-        appData[listName].push(newItem);
+        appData[type].push(newItem);
     }
 
-    // 2. SAUVEGARDE CRUCIALE : Mettre dans le localStorage global
-    // On utilise la même clé que le site public consultera
-    localStorage.setItem('labmath_data', JSON.stringify(appData));
-
-    // 3. Interface
-    closeModal();
+    // MISE À JOUR VISUELLE
     updateAllTables();
     updateStats();
-    showAlert('success', 'Enregistré avec succès localement !');
+    closeModal();
+
+    // SAUVEGARDE AUTOMATIQUE VERS LE SERVEUR (Important !)
+    await syncAll(); 
 }
 
         // ============================================

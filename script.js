@@ -35,6 +35,17 @@ function truncateText(text, maxLength = 100) {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
 }
 
+function downloadData() {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData, null, 2));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "data.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+    showAlert('success', 'Fichier prêt ! Remplacez le data.json actuel par celui-ci.');
+}
+
 // ===== CHARGEMENT HYBRIDE DES DONNÉES (CRUCIAL) =====
 async function loadAllAppData() {
     // 1. Tenter de charger depuis le LocalStorage (modifs Admin)
