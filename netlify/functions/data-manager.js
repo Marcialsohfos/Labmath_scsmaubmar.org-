@@ -5,7 +5,6 @@ const path = require('path');
 exports.handler = async (event) => {
     const dataPath = path.join(__dirname, '../../data.json');
     
-    // HEADERS CORS
     const headers = {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
@@ -17,19 +16,28 @@ exports.handler = async (event) => {
     }
 
     try {
-        // Lire le fichier data.json
-        let data = JSON.parse(await fs.readFile(dataPath, 'utf8'));
+        // Lire le fichier
+        let fileContent;
+        try {
+            fileContent = await fs.readFile(dataPath, 'utf8');
+        } catch (e) {
+            // Si le fichier n'existe pas, créer une structure par défaut
+            const defaultData = {
+                compteurs: { activites: 0, realisations: 0, annonces: 0, offres: 0 },
+                activites: [],
+                realisations: [],
+                annonces: [],
+                offres: [],
+                messages: []
+            };
+            await fs.writeFile(dataPath, JSON.stringify(defaultData, null, 2));
+            fileContent = JSON.stringify(defaultData);
+        }
+        
+        let data = JSON.parse(fileContent);
 
         // GET - Récupérer les données
         if (event.httpMethod === 'GET') {
-            const section = event.queryStringParameters?.section;
-            if (section) {
-                return {
-                    statusCode: 200,
-                    headers,
-                    body: JSON.stringify(data[section] || [])
-                };
-            }
             return {
                 statusCode: 200,
                 headers,
@@ -41,10 +49,8 @@ exports.handler = async (event) => {
         if (event.httpMethod === 'POST') {
             const { section, item } = JSON.parse(event.body);
             
-            // Initialiser la section si elle n'existe pas
             if (!data[section]) data[section] = [];
             
-            // Ajouter l'élément avec un ID unique
             const newItem = {
                 id: Date.now(),
                 ...item,
@@ -53,10 +59,9 @@ exports.handler = async (event) => {
             
             data[section].push(newItem);
             
-            // INCRÉMENTER LE COMPTEUR
+            // Incrémenter le compteur
             if (!data.compteurs) data.compteurs = {};
             data.compteurs[section] = (data.compteurs[section] || 0) + 1;
-            data.compteurs.total = (data.compteurs.total || 0) + 1;
             
             // Sauvegarder
             await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
@@ -72,51 +77,6 @@ exports.handler = async (event) => {
             };
         }
 
-        // PUT - Mettre à jour un élément
-        if (event.httpMethod === 'PUT') {
-            const { section, id, updates } = JSON.parse(event.body);
-            
-            const index = data[section].findIndex(item => item.id === id);
-            if (index !== -1) {
-                data[section][index] = { ...data[section][index], ...updates };
-                await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
-                
-                return {
-                    statusCode: 200,
-                    headers,
-                    body: JSON.stringify({ success: true })
-                };
-            }
-            
-            return {
-                statusCode: 404,
-                headers,
-                body: JSON.stringify({ error: 'Élément non trouvé' })
-            };
-        }
-
-        // DELETE - Supprimer un élément
-        if (event.httpMethod === 'DELETE') {
-            const { section, id } = JSON.parse(event.body);
-            
-            data[section] = data[section].filter(item => item.id !== id);
-            
-            // DÉCRÉMENTER LE COMPTEUR
-            data.compteurs[section] = Math.max(0, (data.compteurs[section] || 1) - 1);
-            data.compteurs.total = Math.max(0, (data.compteurs.total || 1) - 1);
-            
-            await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
-            
-            return {
-                statusCode: 200,
-                headers,
-                body: JSON.stringify({ 
-                    success: true,
-                    compteurs: data.compteurs 
-                })
-            };
-        }
-
         return {
             statusCode: 405,
             headers,
@@ -128,7 +88,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 500,
             headers,
-            body: JSON.stringify({ error: 'Erreur serveur' })
+            body: JSON.stringify({ error: 'Erreur serveur: ' + error.message })
         };
     }
 };
