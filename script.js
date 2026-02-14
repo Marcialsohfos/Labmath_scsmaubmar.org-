@@ -235,6 +235,13 @@ window.deleteMessage = function(id) {
         renderAdminMessages();
     }
 };
+// Incrémenter le compteur de visites dans le localStorage
+function incrementVisits() {
+    let visits = localStorage.getItem('labmath_visits') || 0;
+    visits = parseInt(visits) + 1;
+    localStorage.setItem('labmath_visits', visits);
+}
+incrementVisits();
 
 // Modifier votre fonction loadAllData pour inclure l'appel
 // Ajoutez renderAdminMessages() à l'intérieur de loadAllData()

@@ -336,6 +336,14 @@
                 <div class="stat-number" id="stat-offres">0</div>
                 <small id="stat-offres-active" style="color: #00ff00;">0 actives</small>
             </div>
+             <div class="stat-card">
+           <div style="font-size: 2rem; color: #ff00ff; margin-bottom: 0.5rem;">
+               <i class="fas fa-users"></i>
+           </div>
+              <h3>Visiteurs</h3>
+           <div class="stat-number" id="stat-visiteurs">0</div>
+              <small id="stat-visiteurs-label" style="color: var(--primary);">Total des vues</small>
+           </div>
         </div>
 
         <!-- Tabs de gestion -->
@@ -771,8 +779,13 @@
             
             document.getElementById('stat-offres').textContent = appData.offres.length;
             document.getElementById('stat-offres-active').textContent = 
-                `${appData.offres.filter(o => o.est_active).length} actives`;
-        }
+                `${appData.offres.filter(o => o.est_active).length} actives`;     
+
+           // Récupérer et afficher les visites
+           const totalVisits = localStorage.getItem('labmath_visits') || 0;
+           document.getElementById('stat-visiteurs').textContent = totalVisits;            
+
+          }
 
         // ============================================
         // GESTION DU MODAL
