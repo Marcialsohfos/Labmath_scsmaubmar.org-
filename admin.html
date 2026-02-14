@@ -313,6 +313,12 @@
                 <div class="stat-number" id="stat-activites">0</div>
                 <small id="stat-activites-pub" style="color: #00ff00;">0 publiées</small>
             </div>
+       <div class="stat-card">
+               <div style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;">✉️</div>
+               <h3>Messages</h3>
+               <div class="stat-number" id="stat-messages">0</div>
+              <small id="stat-messages-new" style="color: #ffff00;">0 nouveaux</small>
+            </div>
             <div class="stat-card">
                 <div style="font-size: 2rem; color: var(--secondary); margin-bottom: 0.5rem;">∑</div>
                 <h3>Réalisations</h3>
@@ -338,6 +344,10 @@
             <button class="tab-btn" onclick="switchTab('realisations')">🏆 Réalisations</button>
             <button class="tab-btn" onclick="switchTab('annonces')">📢 Annonces</button>
             <button class="tab-btn" onclick="switchTab('offres')">💼 Offres</button>
+        </div>
+        <div class="tab-container">
+            <button class="tab-btn" onclick="switchTab('offres')">💼 Offres</button>
+            <button class="tab-btn" onclick="switchTab('messages')">📩 Messages</button> 
         </div>
 
         <!-- Tab: Activités -->
@@ -531,6 +541,20 @@
                 </div>
             </form>
         </div>
+              <div id="tab-messages" class="tab-pane">
+    <div class="math-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3>Boîte de réception</h3>
+            <button class="btn btn-outline" onclick="renderAdminMessages()">
+                <i class="fas fa-sync-alt"></i> Actualiser
+            </button>
+        </div>
+        
+        <div id="messages-list" style="display: grid; gap: 1.5rem;">
+            <p style="text-align: center; color: rgba(255,255,255,0.5);">Aucun message pour le moment.</p>
+        </div>
+    </div>
+</div>
     </div>
 
     <script src="config.js"></script>

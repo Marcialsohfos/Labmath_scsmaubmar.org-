@@ -113,3 +113,128 @@ window.saveDataToStorage = function(data) {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     console.log("Système: Données synchronisées localement.");
 };
+// Fonction pour afficher les messages dans l'admin
+function renderAdminMessages() {
+    const container = document.getElementById('messages-list');
+    if (!container) return;
+
+    const data = JSON.parse(localStorage.getItem('labmath_data')) || { messages: [] };
+    const messages = data.messages || [];
+
+    if (messages.length === 0) {
+        container.innerHTML = '<p>Aucun message reçu.</p>';
+        return;
+    }
+
+    // On trie du plus récent au plus ancien
+    container.innerHTML = messages.reverse().map(msg => `
+        <div class="math-card ${msg.lu ? '' : 'unread'}" style="border-left: 4px solid ${msg.lu ? '#444' : 'var(--primary)'}">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                <small>${new Date(msg.date).toLocaleString('fr-FR')}</small>
+                ${!msg.lu ? '<span class="badge">Nouveau</span>' : ''}
+            </div>
+            <h4>${msg.sujet}</h4>
+            <p><strong>De:</strong> ${msg.nom} (${msg.email})</p>
+            <p style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin: 10px 0;">
+                ${msg.contenu}
+            </p>
+            <div class="admin-actions">
+                <button onclick="markAsRead(${msg.id})" class="btn-sm">
+                    ${msg.lu ? 'Marquer non lu' : 'Marquer comme lu'}
+                </button>
+                <a href="mailto:${msg.email}?subject=Re: ${msg.sujet}" class="btn-sm btn-primary">
+                    <i class="fas fa-reply"></i> Répondre par Email
+                </a>
+                <button onclick="deleteMessage(${msg.id})" class="btn-sm btn-danger">Supprimer</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Marquer comme lu
+window.markAsRead = function(id) {
+    let data = JSON.parse(localStorage.getItem('labmath_data'));
+    const index = data.messages.findIndex(m => m.id === id);
+    if (index !== -1) {
+        data.messages[index].lu = !data.messages[index].lu;
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        renderAdminMessages();
+    }
+};
+
+// Supprimer un message
+window.deleteMessage = function(id) {
+    if(confirm('Supprimer ce message définitivement ?')) {
+        let data = JSON.parse(localStorage.getItem('labmath_data'));
+        data.messages = data.messages.filter(m => m.id !== id);
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        renderAdminMessages();
+    }
+};
+
+// --- GESTION DES MESSAGES ---
+
+function renderAdminMessages() {
+    const container = document.getElementById('messages-list');
+    const data = JSON.parse(localStorage.getItem('labmath_data')) || { messages: [] };
+    const messages = data.messages || [];
+
+    // Mise à jour des compteurs dans les stats
+    const nouveaux = messages.filter(m => !m.lu).length;
+    document.getElementById('stat-messages').textContent = messages.length;
+    document.getElementById('stat-messages-new').textContent = `${nouveaux} nouveaux`;
+
+    if (messages.length === 0) {
+        container.innerHTML = '<p style="text-align: center; opacity: 0.5;">Aucun message reçu.</p>';
+        return;
+    }
+
+    // Affichage des messages (du plus récent au plus ancien)
+    container.innerHTML = [...messages].reverse().map(msg => `
+        <div class="math-card" style="border-left: 4px solid ${msg.lu ? 'transparent' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">${msg.sujet}</h4>
+                    <small style="color: rgba(255,255,255,0.5);">De: <strong>${msg.nom}</strong> (${msg.email}) - ${new Date(msg.date).toLocaleString('fr-FR')}</small>
+                </div>
+                ${!msg.lu ? '<span class="status-badge status-published">Nouveau</span>' : ''}
+            </div>
+            <p style="margin: 15px 0; line-height: 1.6; white-space: pre-wrap;">${msg.contenu}</p>
+            <div style="display: flex; gap: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <button class="btn btn-sm ${msg.lu ? 'btn-outline' : 'btn-primary'}" onclick="toggleRead(${msg.id})">
+                    <i class="fas ${msg.lu ? 'fa-envelope-open' : 'fa-check'}"></i> ${msg.lu ? 'Marquer non lu' : 'Lu'}
+                </button>
+                <a href="mailto:${msg.email}?subject=Re: ${msg.sujet}" class="btn btn-sm btn-primary" style="text-decoration: none;">
+                    <i class="fas fa-reply"></i> Répondre
+                </a>
+                <button class="action-btn delete" onclick="deleteMessage(${msg.id})">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Changer l'état Lu/Non Lu
+window.toggleRead = function(id) {
+    let data = JSON.parse(localStorage.getItem('labmath_data'));
+    const msg = data.messages.find(m => m.id === id);
+    if (msg) {
+        msg.lu = !msg.lu;
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        renderAdminMessages();
+    }
+};
+
+// Supprimer un message
+window.deleteMessage = function(id) {
+    if(confirm('Supprimer définitivement ce message ?')) {
+        let data = JSON.parse(localStorage.getItem('labmath_data'));
+        data.messages = data.messages.filter(m => m.id !== id);
+        localStorage.setItem('labmath_data', JSON.stringify(data));
+        renderAdminMessages();
+    }
+};
+
+// Modifier votre fonction loadAllData pour inclure l'appel
+// Ajoutez renderAdminMessages() à l'intérieur de loadAllData()
