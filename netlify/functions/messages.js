@@ -1,7 +1,6 @@
 // netlify/functions/messages.js
 const fs = require('fs').promises;
 const path = require('path');
-const nodemailer = require('nodemailer');
 
 exports.handler = async (event) => {
     const dataPath = path.join(__dirname, '../../data.json');
@@ -41,8 +40,12 @@ exports.handler = async (event) => {
             
             await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
             
-            // Envoyer notification par email
-            await envoyerNotification(nouveauMessage);
+            // SIMULATION d'envoi d'email (sans nodemailer)
+            console.log('=== NOUVEAU MESSAGE ===');
+            console.log('De:', nom, email);
+            console.log('Sujet:', sujet);
+            console.log('Message:', message);
+            console.log('=======================');
             
             return {
                 statusCode: 200,
@@ -75,8 +78,11 @@ exports.handler = async (event) => {
                 
                 await fs.writeFile(dataPath, JSON.stringify(data, null, 2));
                 
-                // Envoyer la réponse par email
-                await envoyerReponse(data.messages[index]);
+                // SIMULATION d'envoi de réponse
+                console.log('=== RÉPONSE ENVOYÉE ===');
+                console.log('À:', data.messages[index].email);
+                console.log('Réponse:', reponse);
+                console.log('========================');
                 
                 return {
                     statusCode: 200,
@@ -101,36 +107,3 @@ exports.handler = async (event) => {
         };
     }
 };
-
-// Fonction pour envoyer une notification
-async function envoyerNotification(message) {
-    // Configuration Email (avec EmailJS ou autre service)
-    console.log('Nouveau message reçu:', message);
-    
-    // Exemple avec EmailJS (côté client) ou un service SMTP
-    // Vous pouvez utiliser SendGrid, Mailgun, etc.
-}
-
-// Fonction pour envoyer la réponse
-async function envoyerReponse(message) {
-    console.log('Réponse envoyée à', message.email, ':', message.reponse);
-    
-    // Ici, code pour envoyer l'email réel
-    // Exemple avec SMTP
-    /*
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        }
-    });
-    
-    await transporter.sendMail({
-        from: '"Lab_Math" <noreply@labmathscsmaubmar.org>',
-        to: message.email,
-        subject: `Re: ${message.sujet}`,
-        text: `Bonjour ${message.nom},\n\n${message.reponse}\n\nCordialement,\nL'équipe Lab_Math`
-    });
-    */
-}
