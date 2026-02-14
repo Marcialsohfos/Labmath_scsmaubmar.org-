@@ -59,6 +59,7 @@ async function loadAllAppData() {
     }
 }
 
+
 // ===== AFFICHAGE DES ACTIVITÉS (SITE PUBLIC) =====
 
 async function renderActivites() {
@@ -154,6 +155,21 @@ window.deleteMessage = function(id) {
     }
 };
 
+// Ouvrir le formulaire de création
+window.openModal = function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+};
+
+// Fermer le formulaire
+window.closeModal = function(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.display = 'none';
+    }
+};
 // ===== VISITES ET INITIALISATION =====
 
 function incrementVisits() {
@@ -200,4 +216,33 @@ window.downloadData = function() {
     downloadAnchorNode.click();
     downloadAnchorNode.remove();
     showAlert('success', 'Fichier data.json généré. Remplacez-le sur GitHub.');
+};
+window.saveNewActivity = function(event) {
+    event.preventDefault(); // Empêche la page de se recharger
+    
+    const titre = document.getElementById('act-titre').value;
+    const desc = document.getElementById('act-desc').value;
+    
+    if(!titre || !desc) return showAlert('error', 'Veuillez remplir tous les champs');
+
+    // Charger les données actuelles
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    
+    const nouvelleAct = {
+        id: Date.now(),
+        titre: titre,
+        description: desc,
+        date_creation: new Date().toISOString(),
+        est_publie: true
+    };
+
+    data.activites.push(nouvelleAct);
+    
+    // Sauvegarder et rafraîchir
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    closeModal('modal-activite');
+    showAlert('success', 'Activité ajoutée ! N’oubliez pas de télécharger et remplacer le data.json');
+    
+    // Si vous avez une fonction de rendu admin, lancez-la ici
+    if (typeof renderAdminActivites === 'function') renderAdminActivites();
 };
