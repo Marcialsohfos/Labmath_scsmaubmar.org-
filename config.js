@@ -2,10 +2,11 @@
 // 1. CONFIGURATION GÉNÉRALE
 // ============================================
 const CONFIG = {
-    VERSION: '2.0.0',
+    VERSION: '2.5.0',
     DEBUG: window.location.hostname === 'localhost',
     API_URL: window.location.origin,
-    API_KEY: 'labmath_api_secret_2024',
+    // Note: L'API_KEY ici est interne à votre logique d'affichage
+    API_KEY: 'labmath_api_secret_2026', 
     DISPLAY: {
         ITEMS_PER_PAGE: 9,
         ANIMATIONS_ENABLED: true
@@ -13,68 +14,68 @@ const CONFIG = {
     MESSAGES: {
         SAVE_SUCCESS: '✅ Données sauvegardées localement',
         SAVE_ERROR: '❌ Erreur lors de la sauvegarde',
-        DELETE_CONFIRM: 'Êtes-vous sûr de vouloir supprimer cet élément ?'
+        DELETE_CONFIRM: 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+        DEPLOY_SUCCESS: '🚀 Plateforme Lab_Math mise à jour avec succès !'
     }
 };
 
 // ============================================
-// 2. CONFIGURATION GITHUB (SÉCURISÉE)
+// 2. CONFIGURATION GITHUB (LIÉE À VOTRE DÉPÔT)
 // ============================================
 const GITHUB_CONFIG = {
-    owner: 'VOTRE_PSEUDO_GITHUB', // ⚠️ À MODIFIER
-    repo: 'VOTRE_NOM_DEPOT',      // ⚠️ À MODIFIER (ex: lab_math)
-    branch: 'main'
+    owner: 'Marcialsohfos', 
+    repo: 'Labmath_scsmaubmar.org-', 
+    branch: 'main',
+    filePath: 'data.json' // Le fichier qui contient vos activités/annonces
 };
 
 // ============================================
-// 3. ÉQUATIONS ET THÈME VISUEL
+// 3. THÈME VISUEL (LAB_MATH 2026)
 // ============================================
-const MATH_EQUATIONS = [
-    '∫ f(x) dx = F(b) - F(a)', '∑ 1/n² = π²/6', 
-    'e^{iπ} + 1 = 0', 'E = mc²', 'sin²θ + cos²θ = 1'
-];
-
 const MATH_COLORS = {
-    primary: '#00ffff', secondary: '#ff00ff', 
-    accent: '#ffff00', dark: '#0a0f1f'
+    primary: '#007bff', // Bleu mariage
+    secondary: '#ffffff', // Blanc
+    accent: '#00d4ff', 
+    dark: '#0a0f1f'
 };
 
 // ============================================
-// 4. FONCTION DE DÉPLOIEMENT (DYNAMIQUE)
+// 4. MOTEUR DE MISE À JOUR DYNAMIQUE (AUTO-SYNC)
 // ============================================
 async function pushToGitHub() {
-    const statusBtn = event.currentTarget;
-    
-    // On demande le token à chaque fois pour éviter qu'il soit volé ou bloqué
-    const userToken = prompt("🔑 Entrez votre Token GitHub (ghp_...) pour publier :");
-    
-    if (!userToken || userToken.trim() === "") {
-        alert("Opération annulée : Le token est nécessaire.");
-        return;
-    }
+    // 1. Récupération du bouton pour l'état visuel
+    const statusBtn = document.querySelector('.btn-deploy') || event.currentTarget;
+    const originalText = statusBtn.innerHTML;
 
-    statusBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Déploiement...';
+    // 2. Sécurité : Demande du token (non stocké dans le code pour éviter le bannissement par GitHub)
+    const userToken = prompt("🔑 Admin Lab_Math : Entrez votre Token personnel (Classic ou Fine-grained) :");
+    
+    if (!userToken) return;
+
+    statusBtn.disabled = true;
+    statusBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Synchronisation...';
     
     try {
-        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/data.json`;
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.owner}/${GITHUB_CONFIG.repo}/contents/${GITHUB_CONFIG.filePath}`;
         
-        // 1. Récupérer le SHA du fichier actuel
+        // A. Récupérer le fichier actuel pour obtenir son SHA (obligatoire pour modifier)
         const getFile = await fetch(url, {
-            headers: { 'Authorization': `token ${userToken}` }
+            headers: { 'Authorization': `token ${userToken}`, 'Accept': 'application/vnd.github.v3+json' }
         });
         
-        if (!getFile.ok) throw new Error("Accès refusé. Vérifiez votre pseudo, le nom du dépôt ou le Token.");
+        if (!getFile.ok) throw new Error("Impossible d'accéder au fichier sur GitHub. Vérifiez le Token.");
         
         const fileData = await getFile.json();
         const sha = fileData.sha;
 
-        // 2. Préparer les données locales
+        // B. Récupérer les données depuis le localStorage (là où l'admin modifie)
         const localData = localStorage.getItem('labmath_data');
-        if (!localData) throw new Error("Aucune donnée locale trouvée à envoyer.");
+        if (!localData) throw new Error("Aucune modification détectée dans l'interface admin.");
         
+        // Encodage propre pour GitHub (Base64)
         const content = btoa(unescape(encodeURIComponent(localData)));
 
-        // 3. Envoyer la mise à jour
+        // C. Envoyer la mise à jour (PUT)
         const response = await fetch(url, {
             method: 'PUT',
             headers: {
@@ -82,7 +83,7 @@ async function pushToGitHub() {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-                message: "Mise à jour automatique data.json",
+                message: `Admin Update: ${new Date().toLocaleString()}`,
                 content: content,
                 sha: sha,
                 branch: GITHUB_CONFIG.branch
@@ -90,21 +91,20 @@ async function pushToGitHub() {
         });
 
         if (response.ok) {
-            alert("🚀 BRAVO ! La base GitHub est à jour. Votre site sera actualisé dans 1 minute.");
+            alert(CONFIG.MESSAGES.DEPLOY_SUCCESS);
         } else {
-            throw new Error("Erreur lors de l'écriture sur GitHub.");
+            const errorRes = await response.json();
+            throw new Error(errorRes.message || "Erreur lors de la mise à jour.");
         }
     } catch (error) {
-        alert("❌ ÉCHEC : " + error.message);
+        alert("❌ ERREUR LAB_MATH : " + error.message);
     } finally {
-        statusBtn.innerHTML = '<i class="fab fa-github"></i> Déployer sur GitHub';
+        statusBtn.disabled = false;
+        statusBtn.innerHTML = originalText;
     }
 }
 
-// ============================================
-// 5. EXPORT FINAL
-// ============================================
+// Export pour utilisation globale
 window.CONFIG = CONFIG;
 window.GITHUB_CONFIG = GITHUB_CONFIG;
-window.MATH_EQUATIONS = MATH_EQUATIONS;
-window.MATH_COLORS = MATH_COLORS;
+window.pushToGitHub = pushToGitHub;
