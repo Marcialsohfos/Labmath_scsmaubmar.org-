@@ -13,6 +13,23 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Particules et formules en arrière-plan -->
+    <div id="math-particles"></div>
+    <div class="floating-formulas">
+        <span>∫</span>
+        <span>∑</span>
+        <span>∏</span>
+        <span>∇</span>
+        <span>∂</span>
+        <span>Δ</span>
+        <span>λ</span>
+        <span>π</span>
+        <span>e<sup>iπ</sup>+1=0</span>
+        <span>f(x)=∫g(x)dx</span>
+        <span>∇·E=ρ/ε₀</span>
+        <span>ψ(x,t)</span>
+    </div>
+
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -39,7 +56,7 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
+    <!-- Hero Section avec animations -->
     <section class="hero">
         <div class="hero-content">
             <span class="hero-badge">
@@ -49,15 +66,27 @@
             
             <h1 class="hero-title">
                 <span class="block">Lab_</span>
-                <span class="gradient-text">Math</span>
+                <span class="gradient-text typing-effect">Math</span>
             </h1>
             
             <p class="hero-description">
-                Pionnier des solutions mathématiques innovantes. 
-                <span class="highlight">Modélisation avancée</span>, 
-                <span class="highlight">algorithmes intelligents</span>, et 
-                <span class="highlight">recherche d'excellence</span>.
+                <span class="typing-text"></span>
             </p>
+            
+            <div class="stats-container">
+                <div class="stat-item">
+                    <span class="stat-number" data-target="150">0</span>
+                    <span class="stat-label">Projets réalisés</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="25">0</span>
+                    <span class="stat-label">Formations</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" data-target="12">0</span>
+                    <span class="stat-label">Partenaires</span>
+                </div>
+            </div>
             
             <div class="hero-buttons">
                 <a href="activites.html" class="btn btn-primary btn-large">
@@ -89,54 +118,93 @@
             </div>
             
             <div class="math-grid">
-                <div class="math-card">
+                <div class="math-card glow-card">
                     <div class="feature-icon">∫</div>
                     <h3>Expertise Pointue</h3>
                     <p>Notre équipe combine chercheurs et ingénieurs spécialisés en mathématiques appliquées, algorithmique et data science.</p>
+                    <div class="card-particles"></div>
                 </div>
                 
-                <div class="math-card">
+                <div class="math-card glow-card">
                     <div class="feature-icon">∑</div>
                     <h3>Mission Scientifique</h3>
                     <p>Développer des solutions mathématiques innovantes répondant aux défis technologiques et industriels contemporains.</p>
+                    <div class="card-particles"></div>
                 </div>
                 
-                <div class="math-card">
+                <div class="math-card glow-card">
                     <div class="feature-icon">∏</div>
                     <h3>Collaboration</h3>
-                    <p>Nous travaillons en synergie avec le SCSM Group pour des projets multidisciplinaires d'envergure.</p>
+                    <p>Nous travaillons en synergie avec le CIE-SCSM Group pour des projets multidisciplinaires d'envergure en robotique.</p>
+                    <div class="card-particles"></div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section Services -->
+    <!-- Section Services avec cartes animées -->
     <section id="services" class="section" style="background: var(--darker-bg);">
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Applications & <span class="gradient-text">Services</span>
+                    Domaines d'<span class="gradient-text">Expertise</span>
                 </h2>
                 <p class="section-subtitle">Des solutions mathématiques innovantes transformées en applications concrètes.</p>
             </div>
             
             <div class="math-grid">
-                <div class="math-card">
-                    <div class="feature-icon">∇</div>
-                    <h3>Algorithmes Optimisés</h3>
-                    <p>Développement d'algorithmes haute performance pour le traitement de données complexes.</p>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Intelligence Artificielle</h3>
+                    <p>Développement d'algorithmes de machine learning et deep learning pour des solutions intelligentes.</p>
+                    <div class="service-hover-effect"></div>
                 </div>
                 
-                <div class="math-card">
-                    <div class="feature-icon">∂</div>
-                    <h3>Modélisation</h3>
-                    <p>Création de modèles prédictifs et simulations avancées.</p>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Data Science</h3>
+                    <p>Analyse avancée de données, modélisation statistique et visualisation interactive.</p>
+                    <div class="service-hover-effect"></div>
                 </div>
                 
-                <div class="math-card">
-                    <div class="feature-icon">Δ</div>
-                    <h3>Analyse de Données</h3>
-                    <p>Méthodes statistiques et machine learning pour extraire des insights.</p>
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-satellite"></i>
+                    </div>
+                    <h3>Géospatial</h3>
+                    <p>Traitement d'images satellitaires et modélisation géospatiale pour l'analyse territoriale.</p>
+                    <div class="service-hover-effect"></div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Robotique</h3>
+                    <p>Algorithmes de contrôle et de vision pour systèmes robotiques autonomes.</p>
+                    <div class="service-hover-effect"></div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Modélisation démographique</h3>
+                    <p>Modèles prédictifs pour l'analyse des dynamiques de population.</p>
+                    <div class="service-hover-effect"></div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>Formation Data Scientists</h3>
+                    <p>Programmes de formation avancée en science des données et mathématiques appliquées.</p>
+                    <div class="service-hover-effect"></div>
                 </div>
             </div>
         </div>
@@ -203,6 +271,9 @@
                         Laboratoire de Mathématiques Appliquées<br>
                         Recherche & Innovation
                     </p>
+                    <p style="margin-top: 1rem; color: var(--primary);">
+                        Partenaire officiel de CIE-SCSM Group
+                    </p>
                 </div>
                 
                 <div class="footer-section">
@@ -210,6 +281,7 @@
                     <ul>
                         <li><a href="index.html">Accueil</a></li>
                         <li><a href="about.html">À propos</a></li>
+                        <li><a href="#services">Services</a></li>
                         <li><a href="activites.html">Activités</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
