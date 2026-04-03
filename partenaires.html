@@ -3,35 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Partenaires - Lab_Math</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Partenaires - Lab_Math | Laboratoire de Mathématiques Appliquées</title>
+    <meta name="description" content="Découvrez les partenaires du laboratoire Lab_Math">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         .partenaire-card {
             text-align: center;
-            transition: transform 0.3s;
+            transition: transform 0.3s, box-shadow 0.3s;
         }
+        
         .partenaire-card:hover {
             transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
         }
-        .partenaire-icon {
+        
+        .partenaire-logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1rem;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 255, 255, 0.05));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 3rem;
-            margin-bottom: 1rem;
+            border: 2px solid rgba(0, 255, 255, 0.3);
         }
+        
         .partenaire-type {
             display: inline-block;
-            padding: 0.2rem 0.8rem;
-            background: rgba(0, 255, 255, 0.1);
+            padding: 0.25rem 0.75rem;
             border-radius: 20px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        
+        .type-academique {
+            background: rgba(0, 255, 255, 0.2);
             color: var(--primary);
+        }
+        
+        .type-industriel {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+        }
+        
+        .type-institutionnel {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff88;
+        }
+        
+        .partenaire-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .partenaire-detail-content {
+            background: linear-gradient(135deg, rgba(10, 10, 20, 0.98), rgba(5, 5, 15, 0.98));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .detail-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .detail-section h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .partenaires-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            text-align: center;
+            padding: 1rem 2rem;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        
+        .stat-card .number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .partenaire-detail-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .partenaires-stats {
+                gap: 1rem;
+            }
+            
+            .stat-card {
+                padding: 0.5rem 1rem;
+            }
+            
+            .stat-card .number {
+                font-size: 1.8rem;
+            }
         }
     </style>
 </head>
 <body>
     <div id="math-particles"></div>
-    
+    <div class="floating-formulas">
+        <span>∫</span><span>∑</span><span>∏</span><span>∇</span><span>∂</span>
+    </div>
+
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -39,21 +188,45 @@
                 <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
             </div>
             <ul class="nav-menu">
-                <li><a href="index.html">Accueil</a></li>
-                <li><a href="about.html">À propos</a></li>
-                <li><a href="formations.html">Formations</a></li>
-                <li><a href="partenaires.html" class="active">Partenaires</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="about.html" class="nav-link">À propos</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="activites.html" class="nav-link">Activités</a></li>
+                <li><a href="projets.html" class="nav-link">Projets</a></li>
+                <li><a href="formations.html" class="nav-link">Formations</a></li>
+                <li><a href="partenaires.html" class="nav-link active">Partenaires</a></li>
+                <li><a href="annonces.html" class="nav-link">Annonces</a></li>
+                <li><a href="offres.html" class="nav-link">Offres</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="login.html" class="nav-link"><i class="fas fa-lock"></i> Admin</a></li>
             </ul>
+            <button class="nav-toggle"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
-    <section class="section">
+    <!-- Section Partenaires -->
+    <section class="section" style="padding-top: 100px;">
         <div class="container">
             <div class="section-header">
-                <h1 class="section-title">🤝 Nos <span class="gradient-text">Partenaires</span></h1>
-                <p class="section-subtitle">Ils nous font confiance et contribuent à notre rayonnement</p>
+                <h2 class="section-title">Nos <span class="gradient-text">Partenaires</span></h2>
+                <p class="section-subtitle">Ils nous font confiance et collaborent avec nous</p>
             </div>
+            
+            <div class="partenaires-stats" id="partenaires-stats">
+                <div class="stat-card">
+                    <div class="number" id="totalPartenaires">0</div>
+                    <div>Partenaires</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="academiques">0</div>
+                    <div>Académiques</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number" id="industriels">0</div>
+                    <div>Industriels</div>
+                </div>
+            </div>
+            
             <div id="partenaires-container" class="math-grid">
                 <div class="text-center" style="grid-column: 1/-1;">
                     <div class="math-loader"></div>
@@ -63,6 +236,15 @@
         </div>
     </section>
 
+    <!-- Modal détails partenaire -->
+    <div id="partenaireModal" class="partenaire-detail-modal">
+        <div class="partenaire-detail-content">
+            <button class="close-modal" onclick="closePartenaireModal()"><i class="fas fa-times"></i></button>
+            <div id="partenaireModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -71,15 +253,23 @@
                         <div class="logo-icon">∑</div>
                         <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
                     </div>
-                    <p>Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
+                    <p style="color: rgba(224,224,255,0.7);">Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
                 </div>
                 <div class="footer-section">
                     <h4>Liens rapides</h4>
                     <ul>
                         <li><a href="index.html">Accueil</a></li>
-                        <li><a href="formations.html">Formations</a></li>
                         <li><a href="partenaires.html">Partenaires</a></li>
+                        <li><a href="projets.html">Projets</a></li>
                         <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contact@labmath.cm</li>
+                        <li><i class="fas fa-phone"></i> +237 620 307 439</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Yaoundé, Cameroun</li>
                     </ul>
                 </div>
             </div>
@@ -90,47 +280,220 @@
     </footer>
 
     <script src="config.js"></script>
-    <script src="script.js"></script>
     <script>
+        let allPartenaires = [];
+        
+        // Données de démonstration pour les partenaires
+        const demoPartenaires = [
+            {
+                id: 1,
+                nom: "Université de Yaoundé I",
+                type: "academique",
+                description: "Partenaire académique historique",
+                description_complete: "L'Université de Yaoundé I est notre partenaire académique principal. Ensemble, nous développons des programmes de recherche conjoints et des formations en mathématiques appliquées. Cette collaboration permet aux étudiants de bénéficier d'une expertise de pointe et de stages au sein du laboratoire.",
+                logo_icon: "fa-university",
+                site_web: "https://www.uy1.uninet.cm",
+                domaine: "Enseignement supérieur, Recherche",
+                projets_communs: [
+                    "Programme de Master en Data Science",
+                    "Projet de recherche sur l'IA",
+                    "Séminaires mensuels"
+                ]
+            },
+            {
+                id: 2,
+                nom: "CIE-SCSM Group",
+                type: "industriel",
+                description: "Partenaire industriel exclusif",
+                description_complete: "CIE-SCSM Group est notre partenaire industriel de référence. Cette collaboration stratégique nous permet de travailler sur des projets concrets en robotique, vision par ordinateur et systèmes embarqués. Ensemble, nous développons des solutions innovantes pour l'industrie.",
+                logo_icon: "fa-building",
+                site_web: "https://www.ciescsm-group.com",
+                domaine: "Robotique, Automatisation, IA",
+                projets_communs: [
+                    "Robotique autonome",
+                    "Vision industrielle",
+                    "Systèmes embarqués"
+                ]
+            },
+            {
+                id: 3,
+                nom: "Ministère de la Recherche",
+                type: "institutionnel",
+                description: "Soutien institutionnel",
+                description_complete: "Le Ministère de la Recherche scientifique nous accorde son soutien pour nos activités de recherche et d'innovation. Ce partenariat permet de financer des projets structurants et de participer à des programmes nationaux d'envergure.",
+                logo_icon: fa-building,
+                site_web: "https://www.minres.cm",
+                domaine: "Recherche scientifique, Innovation",
+                projets_communs: [
+                    "Programme national d'innovation",
+                    "Bourses de recherche",
+                    "Conférences nationales"
+                ]
+            }
+        ];
+        
         async function loadPartenaires() {
-            const container = document.getElementById('partenaires-container');
             try {
                 const response = await fetch('data.json?t=' + Date.now());
-                const data = await response.json();
-                const partenaires = data.partenaires || [];
-                
-                if (partenaires.length === 0) {
-                    container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>Aucun partenaire enregistré pour le moment.</p></div>';
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    allPartenaires = [...(data.partenaires || []), ...demoPartenaires];
+                } else {
+                    const localData = localStorage.getItem('labmath_data');
+                    if (localData) {
+                        const data = JSON.parse(localData);
+                        allPartenaires = [...(data.partenaires || []), ...demoPartenaires];
+                    } else {
+                        allPartenaires = [...demoPartenaires];
+                    }
                 }
-                
-                const typeIcons = {
-                    'Partenariat stratégique': '🎯',
-                    'Partenariat académique': '🎓',
-                    'Partenariat institutionnel': '🏛️',
-                    'Mécénat': '💝',
-                    'Sponsoring': '⭐'
-                };
-                
-                container.innerHTML = partenaires.map(p => `
-                    <div class="math-card partenaire-card">
-                        <div class="partenaire-icon">${typeIcons[p.type] || '🤝'}</div>
-                        <h3>${p.nom}</h3>
-                        <span class="partenaire-type">${p.type || 'Partenariat'}</span>
-                        ${p.description ? `<p style="margin-top: 1rem; font-size: 0.9rem;">${p.description}</p>` : ''}
-                        ${p.site_web ? `<a href="${p.site_web}" target="_blank" class="btn btn-outline btn-small" style="margin-top: 1rem;">Visiter le site <i class="fas fa-external-link-alt"></i></a>` : ''}
-                        <div style="margin-top: 1rem; font-size: 0.7rem; opacity: 0.4;">
-                            Partenaire depuis ${new Date(p.date_creation).toLocaleDateString('fr-FR')}
-                        </div>
-                    </div>
-                `).join('');
+                renderPartenaires();
+                updateStats();
             } catch (error) {
-                console.error('Erreur:', error);
-                container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>⚠️ Erreur de chargement des partenaires.</p></div>';
+                console.error('Erreur chargement:', error);
+                allPartenaires = [...demoPartenaires];
+                renderPartenaires();
+                updateStats();
             }
         }
         
-        document.addEventListener('DOMContentLoaded', loadPartenaires);
+        function updateStats() {
+            const total = allPartenaires.length;
+            const academiques = allPartenaires.filter(p => p.type === 'academique').length;
+            const industriels = allPartenaires.filter(p => p.type === 'industriel').length;
+            
+            document.getElementById('totalPartenaires').textContent = total;
+            document.getElementById('academiques').textContent = academiques;
+            document.getElementById('industriels').textContent = industriels;
+        }
+        
+        function getTypeClass(type) {
+            switch(type) {
+                case 'academique': return 'type-academique';
+                case 'industriel': return 'type-industriel';
+                case 'institutionnel': return 'type-institutionnel';
+                default: return 'type-academique';
+            }
+        }
+        
+        function getTypeText(type) {
+            switch(type) {
+                case 'academique': return 'Académique';
+                case 'industriel': return 'Industriel';
+                case 'institutionnel': return 'Institutionnel';
+                default: return type;
+            }
+        }
+        
+        function renderPartenaires() {
+            const container = document.getElementById('partenaires-container');
+            if (!container) return;
+            
+            if (allPartenaires.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">Aucun partenaire enregistré.</p>';
+                return;
+            }
+            
+            container.innerHTML = allPartenaires.map(partenaire => `
+                <div class="math-card partenaire-card" onclick="openPartenaireModal(${JSON.stringify(partenaire).replace(/"/g, '&quot;')})">
+                    <div class="partenaire-logo">
+                        <i class="fas ${partenaire.logo_icon || 'fa-handshake'}"></i>
+                    </div>
+                    <h3>${partenaire.nom}</h3>
+                    <p>${partenaire.description}</p>
+                    <span class="partenaire-type ${getTypeClass(partenaire.type)}">
+                        ${getTypeText(partenaire.type)}
+                    </span>
+                    <div style="margin-top: 1rem;">
+                        <span class="tech-tag" style="background: var(--primary); color: var(--dark);">
+                            <i class="fas fa-info-circle"></i> Cliquez pour en savoir plus
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openPartenaireModal(partenaire) {
+            const modal = document.getElementById('partenaireModal');
+            const modalContent = document.getElementById('partenaireModalContent');
+            
+            modalContent.innerHTML = `
+                <div style="text-align: center; margin-bottom: 1.5rem;">
+                    <div class="partenaire-logo" style="margin: 0 auto 1rem;">
+                        <i class="fas ${partenaire.logo_icon || 'fa-handshake'}"></i>
+                    </div>
+                    <h2><span class="gradient-text">${partenaire.nom}</span></h2>
+                    <span class="partenaire-type ${getTypeClass(partenaire.type)}" style="margin-top: 0.5rem;">
+                        ${getTypeText(partenaire.type)}
+                    </span>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-align-left"></i> Description</h4>
+                    <p>${partenaire.description_complete || partenaire.description}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-chart-line"></i> Domaine d'activité</h4>
+                    <p>${partenaire.domaine || 'Non spécifié'}</p>
+                </div>
+                
+                ${partenaire.projets_communs ? `
+                    <div class="detail-section">
+                        <h4><i class="fas fa-project-diagram"></i> Projets communs</h4>
+                        <ul class="programme-list">
+                            ${partenaire.projets_communs.map(projet => `<li><i class="fas fa-check-circle"></i> ${projet}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-calendar"></i> Partenaire depuis</h4>
+                    <p>${partenaire.date_creation ? new Date(partenaire.date_creation).getFullYear() : '2024'}</p>
+                </div>
+                
+                ${partenaire.site_web ? `
+                    <div class="realisation-buttons" style="margin-top: 1.5rem;">
+                        <a href="${partenaire.site_web}" target="_blank" class="btn btn-primary">
+                            <i class="fas fa-external-link-alt"></i> Visiter le site web
+                        </a>
+                    </div>
+                ` : ''}
+                
+                <div class="realisation-buttons" style="margin-top: 1rem;">
+                    <button onclick="closePartenaireModal()" class="btn btn-outline">Fermer</button>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closePartenaireModal() {
+            const modal = document.getElementById('partenaireModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Navigation responsive
+        document.querySelector('.nav-toggle')?.addEventListener('click', () => {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadPartenaires();
+            
+            // Fermer modal avec Echap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closePartenaireModal();
+            });
+            
+            // Fermer modal en cliquant à l'extérieur
+            document.getElementById('partenaireModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('partenaireModal')) closePartenaireModal();
+            });
+        });
     </script>
 </body>
 </html>

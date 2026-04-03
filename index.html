@@ -48,7 +48,34 @@
         @media (max-width: 768px) {
             .nav-menu {
                 display: none;
+                position: absolute;
+                top: 70px;
+                left: 0;
+                width: 100%;
+                background: rgba(5, 5, 15, 0.98);
+                backdrop-filter: blur(10px);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+                border-bottom: 1px solid rgba(0, 255, 255, 0.2);
             }
+            
+            .nav-menu.active {
+                display: flex;
+            }
+            
+            .nav-toggle {
+                display: block;
+            }
+        }
+        
+        .nav-toggle {
+            display: none;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 1.5rem;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -83,7 +110,9 @@
                 <li><a href="about.html" class="nav-link" data-key="nav-about">À propos</a></li>
                 <li><a href="#services" class="nav-link" data-key="nav-services">Services</a></li>
                 <li><a href="activites.html" class="nav-link" data-key="nav-activities">Activités</a></li>
-                <li><a href="realisations.html" class="nav-link" data-key="nav-achievements">Réalisations</a></li>
+                <li><a href="projets.html" class="nav-link" data-key="nav-achievements">Projets</a></li>
+                <li><a href="formations.html" class="nav-link" data-key="nav-trainings">Formations</a></li>
+                <li><a href="partenaires.html" class="nav-link" data-key="nav-partners">Partenaires</a></li>
                 <li><a href="annonces.html" class="nav-link" data-key="nav-announcements">Annonces</a></li>
                 <li><a href="offres.html" class="nav-link" data-key="nav-offers">Offres</a></li>
                 <li><a href="contact.html" class="nav-link" data-key="nav-contact">Contact</a></li>
@@ -96,7 +125,7 @@
                 </li>
             </ul>
             
-            <button class="nav-toggle">
+            <button class="nav-toggle" id="navToggle">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
@@ -121,15 +150,15 @@
             
             <div class="stats-container">
                 <div class="stat-item">
-                    <span class="stat-number" data-target="150">0</span>
+                    <span class="stat-number" data-target="0">0</span>
                     <span class="stat-label" data-key="stat-projects">Projets réalisés</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" data-target="25">0</span>
+                    <span class="stat-number" data-target="0">0</span>
                     <span class="stat-label" data-key="stat-trainings">Formations</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number" data-target="12">0</span>
+                    <span class="stat-number" data-target="0">0</span>
                     <span class="stat-label" data-key="stat-partners">Partenaires</span>
                 </div>
             </div>
@@ -280,24 +309,72 @@
         </div>
     </section>
 
-    <!-- Section Réalisations -->
-    <section id="realisations" class="section" style="background: var(--darker-bg);">
+    <!-- Section Projets -->
+    <section id="projets" class="section" style="background: var(--darker-bg);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title"><span data-key="achievements-title">Nos</span> <span class="gradient-text" data-key="achievements-title-highlight">Réalisations</span></h2>
+                <h2 class="section-title"><span data-key="achievements-title">Nos</span> <span class="gradient-text" data-key="achievements-title-highlight">Projets Réalisés</span></h2>
                 <p class="section-subtitle" data-key="achievements-subtitle">Découvrez les projets et innovations que nous avons concrétisés.</p>
             </div>
 
             <div id="realisations-container" class="math-grid">
                 <div class="text-center" style="grid-column: 1/-1;">
                     <div class="math-loader"></div>
-                    <p style="color: var(--primary); margin-top: 1rem;" data-key="loading-achievements">Chargement des réalisations...</p>
+                    <p style="color: var(--primary); margin-top: 1rem;" data-key="loading-achievements">Chargement des projets...</p>
                 </div>
             </div>
             
             <div class="text-center" style="margin-top: 2rem;">
-                <a href="realisations.html" class="btn btn-outline" data-key="btn-view-all-achievements">
-                    Voir toutes les réalisations
+                <a href="projets.html" class="btn btn-outline" data-key="btn-view-all-achievements">
+                    Voir tous les projets
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Formations -->
+    <section id="formations" class="section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title"><span>Nos</span> <span class="gradient-text">Formations</span></h2>
+                <p class="section-subtitle">Programmes de formation en mathématiques appliquées et data science</p>
+            </div>
+
+            <div id="formations-home-container" class="math-grid">
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <div class="math-loader"></div>
+                    <p style="color: var(--primary); margin-top: 1rem;">Chargement des formations...</p>
+                </div>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem;">
+                <a href="formations.html" class="btn btn-outline">
+                    Voir toutes les formations
+                    <i class="fas fa-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Partenaires -->
+    <section id="partenaires" class="section" style="background: var(--darker-bg);">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title"><span>Nos</span> <span class="gradient-text">Partenaires</span></h2>
+                <p class="section-subtitle">Ils nous font confiance et collaborent avec nous</p>
+            </div>
+
+            <div id="partenaires-home-container" class="math-grid">
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <div class="math-loader"></div>
+                    <p style="color: var(--primary); margin-top: 1rem;">Chargement des partenaires...</p>
+                </div>
+            </div>
+            
+            <div class="text-center" style="margin-top: 2rem;">
+                <a href="partenaires.html" class="btn btn-outline">
+                    Voir tous les partenaires
                     <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
@@ -329,6 +406,9 @@
                         <li><a href="about.html" data-key="footer-about">À propos</a></li>
                         <li><a href="#services" data-key="footer-services">Services</a></li>
                         <li><a href="activites.html" data-key="footer-activities">Activités</a></li>
+                        <li><a href="projets.html">Projets</a></li>
+                        <li><a href="formations.html">Formations</a></li>
+                        <li><a href="partenaires.html">Partenaires</a></li>
                         <li><a href="contact.html" data-key="footer-contact">Contact</a></li>
                     </ul>
                 </div>
@@ -351,24 +431,251 @@
     </footer>
 
     <script src="config.js"></script>
-    <script src="script.js"></script>
-    
     <script>
-        // Translations dictionary
+        // ===== DONNÉES DÉMOS =====
+        const DEMOS = {
+            carteInteractive: {
+                id: 'demo_carte',
+                titre: '📍 Carte interactive des densités de population',
+                description: 'Visualisation dynamique des disparités de population sur un territoire. Carte avec cercles proportionnels pour l\'analyse territoriale.',
+                description_complete: 'Cette carte interactive permet de visualiser les densités de population à différentes échelles. Les données proviennent de sources officielles et sont mises à jour annuellement.',
+                categorie: 'Géospatial',
+                methodologie: 'Données OpenStreetMap & WorldPop, modélisation avec Python/Folium.',
+                technologies: ['Python', 'Folium', 'Leaflet', 'OpenStreetMap'],
+                demo_url: '#',
+                github_url: '#',
+                date_creation: '2024-01-15',
+                statut: 'Terminé',
+                est_publie: true,
+                est_demo: true
+            },
+            simulateurSIR: {
+                id: 'demo_sir',
+                titre: '🦠 Simulateur épidémique SIR',
+                description: 'Simulation interactive d\'une épidémie avec le modèle SIR (Sains, Infectés, Guéris).',
+                description_complete: 'Ce simulateur utilise le modèle compartimental SIR pour modéliser la propagation d\'une épidémie. L\'utilisateur peut ajuster les paramètres en temps réel.',
+                categorie: 'Modélisation',
+                methodologie: 'Modèle compartimental d\'équations différentielles, simulation JavaScript.',
+                technologies: ['JavaScript', 'Chart.js', 'HTML/CSS', 'Modèle SIR'],
+                demo_url: '#',
+                github_url: '#',
+                date_creation: '2024-02-20',
+                statut: 'Terminé',
+                est_publie: true,
+                est_demo: true
+            }
+        };
+
+        const demoFormations = [
+            {
+                id: 1,
+                titre: "Data Science Avancée avec Python",
+                description: "Maîtrisez les techniques avancées de data science",
+                duree: "3 mois",
+                statut: "en-cours",
+                formateur: "Dr. Jean Mbarga"
+            },
+            {
+                id: 2,
+                titre: "Mathématiques pour l'Intelligence Artificielle",
+                description: "Les fondements mathématiques de l'IA",
+                duree: "2 mois",
+                statut: "termine",
+                formateur: "Pr. Marie Ngoa"
+            }
+        ];
+
+        const demoPartenaires = [
+            {
+                id: 1,
+                nom: "Université de Yaoundé I",
+                type: "academique",
+                description: "Partenaire académique historique",
+                logo_icon: "fa-university"
+            },
+            {
+                id: 2,
+                nom: "CIE-SCSM Group",
+                type: "industriel",
+                description: "Partenaire industriel exclusif",
+                logo_icon: "fa-building"
+            }
+        ];
+
+        // ===== FONCTIONS =====
+        function animateNumber(element, target) {
+            if (!element) return;
+            let current = 0;
+            const duration = 1000;
+            const increment = target / (duration / 16);
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+
+        async function loadAllData() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('labmath_data', JSON.stringify(data));
+                    return data;
+                }
+            } catch (error) {}
+            
+            const localData = localStorage.getItem('labmath_data');
+            if (localData) return JSON.parse(localData);
+            
+            return { activites: [], realisations: [], formations: [], partenaires: [] };
+        }
+
+        async function updateStatCounters() {
+            const data = await loadAllData();
+            const realisationsExistantes = data.realisations || [];
+            const tousProjets = [...realisationsExistantes, DEMOS.carteInteractive, DEMOS.simulateurSIR];
+            const projetsCount = tousProjets.filter(p => p.est_publie === true).length;
+            const formationsCount = (data.formations || []).length + demoFormations.length;
+            const partenairesCount = (data.partenaires || []).length + demoPartenaires.length;
+            
+            const statNumbers = document.querySelectorAll('.stat-number');
+            if (statNumbers.length >= 3) {
+                animateNumber(statNumbers[0], projetsCount);
+                animateNumber(statNumbers[1], formationsCount);
+                animateNumber(statNumbers[2], partenairesCount);
+            }
+        }
+
+        async function renderActivites() {
+            const container = document.getElementById('activites-container');
+            if (!container) return;
+            const data = await loadAllData();
+            const activites = data.activites || [];
+            const publiees = activites.filter(a => String(a.est_publie) === "true");
+
+            if (publiees.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucune activité publiée.</p>';
+                return;
+            }
+
+            container.innerHTML = publiees.slice(0, 3).map(act => `
+                <div class="math-card">
+                    <div style="font-size: 1.5rem; color: var(--primary);">∫</div>
+                    <h3>${act.titre}</h3>
+                    <p>${act.description?.substring(0, 120) || ''}${act.description?.length > 120 ? '...' : ''}</p>
+                    <div style="margin-top:1rem; font-size:0.8rem; opacity:0.7;">
+                        <i class="fas fa-calendar"></i> ${formatDate(act.date_creation)}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function renderRealisations() {
+            const container = document.getElementById('realisations-container');
+            if (!container) return;
+            const data = await loadAllData();
+            const realisationsExistantes = data.realisations || [];
+            const toutesLesRealisations = [...realisationsExistantes, DEMOS.carteInteractive, DEMOS.simulateurSIR];
+            const publiees = toutesLesRealisations.filter(r => r.est_publie === true);
+
+            if (publiees.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucun projet publié.</p>';
+                return;
+            }
+
+            container.innerHTML = publiees.slice(0, 3).map(projet => `
+                <div class="math-card glow-card">
+                    <div class="realisation-header">
+                        <span class="realisation-categorie">${projet.categorie || 'Projet'}</span>
+                        <span class="realisation-date">${formatDate(projet.date_creation)}</span>
+                        ${projet.est_demo ? '<span class="demo-badge">🎯 Démo</span>' : ''}
+                    </div>
+                    <h3>${projet.titre}</h3>
+                    <p>${projet.description?.substring(0, 100) || ''}${projet.description?.length > 100 ? '...' : ''}</p>
+                    ${projet.technologies ? `
+                        <div class="realisation-techs">
+                            ${projet.technologies.slice(0, 3).map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        async function renderHomeFormations() {
+            const container = document.getElementById('formations-home-container');
+            if (!container) return;
+            const data = await loadAllData();
+            const formations = [...(data.formations || []), ...demoFormations];
+            
+            if (formations.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucune formation disponible.</p>';
+                return;
+            }
+
+            container.innerHTML = formations.slice(0, 3).map(formation => `
+                <div class="math-card">
+                    <div style="font-size: 1.5rem; color: var(--primary);">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h3>${formation.titre}</h3>
+                    <p>${formation.description?.substring(0, 100) || ''}${formation.description?.length > 100 ? '...' : ''}</p>
+                    <div style="margin-top:1rem; font-size:0.8rem; opacity:0.7;">
+                        <i class="fas fa-clock"></i> ${formation.duree || 'Durée non spécifiée'}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function renderHomePartenaires() {
+            const container = document.getElementById('partenaires-home-container');
+            if (!container) return;
+            const data = await loadAllData();
+            const partenaires = [...(data.partenaires || []), ...demoPartenaires];
+            
+            if (partenaires.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucun partenaire enregistré.</p>';
+                return;
+            }
+
+            container.innerHTML = partenaires.slice(0, 3).map(partenaire => `
+                <div class="math-card" style="text-align: center;">
+                    <div style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;">
+                        <i class="fas ${partenaire.logo_icon || 'fa-handshake'}"></i>
+                    </div>
+                    <h3>${partenaire.nom}</h3>
+                    <p>${partenaire.description}</p>
+                    <div style="margin-top:1rem;">
+                        <span class="tech-tag">${partenaire.type === 'academique' ? 'Académique' : partenaire.type === 'industriel' ? 'Industriel' : 'Institutionnel'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Récemment';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        // ===== TRADUCTIONS =====
         const translations = {
             fr: {
-                // Navigation
                 "nav-home": "Accueil",
                 "nav-about": "À propos",
                 "nav-services": "Services",
                 "nav-activities": "Activités",
-                "nav-achievements": "Réalisations",
+                "nav-achievements": "Projets",
+                "nav-trainings": "Formations",
+                "nav-partners": "Partenaires",
                 "nav-announcements": "Annonces",
                 "nav-offers": "Offres",
                 "nav-contact": "Contact",
                 "nav-admin": "Admin",
-                
-                // Hero
                 "hero-badge": "Laboratoire de recherche actif",
                 "hero-typing": "Laboratoire de Mathématiques Appliquées | Recherche & Innovation",
                 "stat-projects": "Projets réalisés",
@@ -376,8 +683,6 @@
                 "stat-partners": "Partenaires",
                 "btn-activities": "Voir nos activités",
                 "btn-contact": "Nous contacter",
-                
-                // About section
                 "about-title": "À propos de",
                 "about-subtitle": "Laboratoire d'excellence dédié à la recherche en mathématiques appliquées et au développement d'algorithmes innovants.",
                 "card-expertise-title": "Expertise Pointue",
@@ -386,8 +691,6 @@
                 "card-mission-desc": "Développer des solutions mathématiques innovantes répondant aux défis technologiques et industriels contemporains.",
                 "card-collab-title": "Collaboration",
                 "card-collab-desc": "Nous travaillons en synergie avec le CIE-SCSM Group pour des projets multidisciplinaires d'envergure en robotique.",
-                
-                // Services section
                 "services-title": "Domaines d'",
                 "services-title-highlight": "Expertise",
                 "services-subtitle": "Des solutions mathématiques innovantes transformées en applications concrètes.",
@@ -403,22 +706,16 @@
                 "service-demo-desc": "Modèles prédictifs pour l'analyse des dynamiques de population.",
                 "service-training": "Formation Data Scientists",
                 "service-training-desc": "Programmes de formation avancée en science des données et mathématiques appliquées.",
-                
-                // Activities section
                 "activities-title": "Actualités &",
                 "activities-title-highlight": "Activités",
                 "activities-subtitle": "Suivez en temps réel les dernières avancées de notre laboratoire.",
                 "loading-activities": "Chargement des activités...",
                 "btn-view-all": "Voir toutes les activités",
-                
-                // Achievements section
                 "achievements-title": "Nos",
-                "achievements-title-highlight": "Réalisations",
+                "achievements-title-highlight": "Projets Réalisés",
                 "achievements-subtitle": "Découvrez les projets et innovations que nous avons concrétisés.",
-                "loading-achievements": "Chargement des réalisations...",
-                "btn-view-all-achievements": "Voir toutes les réalisations",
-                
-                // Footer
+                "loading-achievements": "Chargement des projets...",
+                "btn-view-all-achievements": "Voir tous les projets",
                 "footer-desc": "Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation",
                 "footer-partner": "Partenaire officiel de CIE-SCSM Group",
                 "footer-links": "Liens rapides",
@@ -433,18 +730,17 @@
                 "math-applied": "Mathématiques Appliquées"
             },
             en: {
-                // Navigation
                 "nav-home": "Home",
                 "nav-about": "About",
                 "nav-services": "Services",
                 "nav-activities": "Activities",
-                "nav-achievements": "Achievements",
+                "nav-achievements": "Projects",
+                "nav-trainings": "Trainings",
+                "nav-partners": "Partners",
                 "nav-announcements": "Announcements",
                 "nav-offers": "Offers",
                 "nav-contact": "Contact",
                 "nav-admin": "Admin",
-                
-                // Hero
                 "hero-badge": "Active Research Laboratory",
                 "hero-typing": "Applied Mathematics Laboratory | Research & Innovation",
                 "stat-projects": "Projects Completed",
@@ -452,8 +748,6 @@
                 "stat-partners": "Partners",
                 "btn-activities": "View our activities",
                 "btn-contact": "Contact us",
-                
-                // About section
                 "about-title": "About",
                 "about-subtitle": "Center of excellence dedicated to research in applied mathematics and development of innovative algorithms.",
                 "card-expertise-title": "Specialized Expertise",
@@ -462,8 +756,6 @@
                 "card-mission-desc": "Developing innovative mathematical solutions to meet contemporary technological and industrial challenges.",
                 "card-collab-title": "Collaboration",
                 "card-collab-desc": "We work in synergy with CIE-SCSM Group for large-scale multidisciplinary robotics projects.",
-                
-                // Services section
                 "services-title": "Areas of ",
                 "services-title-highlight": "Expertise",
                 "services-subtitle": "Innovative mathematical solutions transformed into concrete applications.",
@@ -479,22 +771,16 @@
                 "service-demo-desc": "Predictive models for population dynamics analysis.",
                 "service-training": "Data Scientist Training",
                 "service-training-desc": "Advanced training programs in data science and applied mathematics.",
-                
-                // Activities section
                 "activities-title": "News &",
                 "activities-title-highlight": "Activities",
                 "activities-subtitle": "Follow the latest advances of our laboratory in real time.",
                 "loading-activities": "Loading activities...",
                 "btn-view-all": "View all activities",
-                
-                // Achievements section
                 "achievements-title": "Our",
-                "achievements-title-highlight": "Achievements",
+                "achievements-title-highlight": "Projects",
                 "achievements-subtitle": "Discover the projects and innovations we have realized.",
-                "loading-achievements": "Loading achievements...",
-                "btn-view-all-achievements": "View all achievements",
-                
-                // Footer
+                "loading-achievements": "Loading projects...",
+                "btn-view-all-achievements": "View all projects",
                 "footer-desc": "Applied Mathematics Laboratory<br>Research & Innovation",
                 "footer-partner": "Official partner of CIE-SCSM Group",
                 "footer-links": "Quick links",
@@ -509,16 +795,13 @@
                 "math-applied": "Applied Mathematics"
             }
         };
-        
+
         let currentLang = 'fr';
-        
-        // Function to update all text content
+
         function updateLanguage(lang) {
-            // Update all elements with data-key attribute
             document.querySelectorAll('[data-key]').forEach(element => {
                 const key = element.getAttribute('data-key');
                 if (translations[lang][key]) {
-                    // Handle HTML content for elements that may contain HTML
                     if (key === 'hero-typing' || key === 'footer-desc') {
                         element.innerHTML = translations[lang][key];
                     } else {
@@ -526,42 +809,23 @@
                     }
                 }
             });
-            
-            // Update HTML lang attribute
             document.documentElement.lang = lang;
-            
-            // Update button text
             const langText = document.getElementById('langText');
-            if (langText) {
-                langText.textContent = lang.toUpperCase();
-            }
-            
-            // Save preference to localStorage
+            if (langText) langText.textContent = lang.toUpperCase();
             localStorage.setItem('lab_math_language', lang);
-            
-            // Trigger any custom event for other scripts to react
-            window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
         }
-        
-        // Toggle language function
+
         function toggleLanguage() {
             currentLang = currentLang === 'fr' ? 'en' : 'fr';
             updateLanguage(currentLang);
-            
-            // Update typing effect text if the typing script is present
-            if (typeof updateTypingText === 'function') {
-                updateTypingText(translations[currentLang]['hero-typing']);
-            }
         }
-        
-        // Initialize language from localStorage or default to French
+
         function initLanguage() {
             const savedLang = localStorage.getItem('lab_math_language');
             if (savedLang && (savedLang === 'fr' || savedLang === 'en')) {
                 currentLang = savedLang;
                 updateLanguage(currentLang);
             } else {
-                // Check browser language
                 const browserLang = navigator.language || navigator.userLanguage;
                 if (browserLang.startsWith('en')) {
                     currentLang = 'en';
@@ -572,15 +836,31 @@
                 }
             }
         }
-        
-        // Add event listener to language switch button
-        const langSwitchBtn = document.getElementById('langSwitch');
-        if (langSwitchBtn) {
-            langSwitchBtn.addEventListener('click', toggleLanguage);
-        }
-        
-        // Initialize language on page load
-        initLanguage();
+
+        // ===== INITIALISATION =====
+        document.addEventListener('DOMContentLoaded', async () => {
+            await updateStatCounters();
+            await renderActivites();
+            await renderRealisations();
+            await renderHomeFormations();
+            await renderHomePartenaires();
+            initLanguage();
+
+            // Navigation responsive
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.querySelector('.nav-menu');
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', () => {
+                    navMenu.classList.toggle('active');
+                });
+            }
+
+            // Langue
+            const langSwitchBtn = document.getElementById('langSwitch');
+            if (langSwitchBtn) {
+                langSwitchBtn.addEventListener('click', toggleLanguage);
+            }
+        });
     </script>
 </body>
 </html>

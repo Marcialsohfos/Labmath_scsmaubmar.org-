@@ -3,33 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formations - Lab_Math</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Formations - Lab_Math | Laboratoire de Mathématiques Appliquées</title>
+    <meta name="description" content="Découvrez toutes les formations proposées par le laboratoire Lab_Math">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
     <style>
         .formation-card {
+            cursor: pointer;
             transition: transform 0.3s, box-shadow 0.3s;
         }
+        
         .formation-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
         }
-        .formation-status {
+        
+        .status-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
             border-radius: 20px;
             font-size: 0.75rem;
             font-weight: 500;
         }
-        .status-planifiee { background: rgba(255, 193, 7, 0.2); color: #ffc107; }
-        .status-encours { background: rgba(0, 255, 0, 0.2); color: #00ff00; }
-        .status-termine { background: rgba(255, 255, 255, 0.2); color: #ccc; }
+        
+        .status-en-cours {
+            background: rgba(0, 255, 255, 0.2);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+        
+        .status-termine {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00ff88;
+            border: 1px solid #00ff88;
+        }
+        
+        .status-planifiee {
+            background: rgba(255, 165, 0, 0.2);
+            color: #ffa500;
+            border: 1px solid #ffa500;
+        }
+        
+        .formation-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .formation-detail-content {
+            background: linear-gradient(135deg, rgba(10, 10, 20, 0.98), rgba(5, 5, 15, 0.98));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .detail-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .detail-section h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .programme-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .programme-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .programme-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .programme-list li i {
+            color: var(--primary);
+            margin-right: 0.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .formation-detail-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .filter-tab {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-tab.active, .filter-tab:hover {
+            background: var(--primary);
+            color: var(--dark);
+            border-color: var(--primary);
+        }
     </style>
 </head>
 <body>
     <div id="math-particles"></div>
-    
+    <div class="floating-formulas">
+        <span>∫</span><span>∑</span><span>∏</span><span>∇</span><span>∂</span>
+    </div>
+
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
@@ -37,21 +186,37 @@
                 <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
             </div>
             <ul class="nav-menu">
-                <li><a href="index.html">Accueil</a></li>
-                <li><a href="about.html">À propos</a></li>
-                <li><a href="formations.html" class="active">Formations</a></li>
-                <li><a href="partenaires.html">Partenaires</a></li>
-                <li><a href="contact.html">Contact</a></li>
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="about.html" class="nav-link">À propos</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="activites.html" class="nav-link">Activités</a></li>
+                <li><a href="projets.html" class="nav-link">Projets</a></li>
+                <li><a href="formations.html" class="nav-link active">Formations</a></li>
+                <li><a href="partenaires.html" class="nav-link">Partenaires</a></li>
+                <li><a href="annonces.html" class="nav-link">Annonces</a></li>
+                <li><a href="offres.html" class="nav-link">Offres</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="login.html" class="nav-link"><i class="fas fa-lock"></i> Admin</a></li>
             </ul>
+            <button class="nav-toggle"><i class="fas fa-bars"></i></button>
         </div>
     </nav>
 
-    <section class="section">
+    <!-- Section Formations -->
+    <section class="section" style="padding-top: 100px;">
         <div class="container">
             <div class="section-header">
-                <h1 class="section-title">📚 Nos <span class="gradient-text">Formations</span></h1>
+                <h2 class="section-title">Nos <span class="gradient-text">Formations</span></h2>
                 <p class="section-subtitle">Programmes de formation en mathématiques appliquées et data science</p>
             </div>
+            
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">Toutes</button>
+                <button class="filter-tab" data-filter="en-cours">En cours</button>
+                <button class="filter-tab" data-filter="termine">Terminées</button>
+                <button class="filter-tab" data-filter="planifiee">Planifiées</button>
+            </div>
+            
             <div id="formations-container" class="math-grid">
                 <div class="text-center" style="grid-column: 1/-1;">
                     <div class="math-loader"></div>
@@ -61,6 +226,15 @@
         </div>
     </section>
 
+    <!-- Modal détails formation -->
+    <div id="formationModal" class="formation-detail-modal">
+        <div class="formation-detail-content">
+            <button class="close-modal" onclick="closeFormationModal()"><i class="fas fa-times"></i></button>
+            <div id="formationModalContent"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -69,15 +243,23 @@
                         <div class="logo-icon">∑</div>
                         <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
                     </div>
-                    <p>Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
+                    <p style="color: rgba(224,224,255,0.7);">Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
                 </div>
                 <div class="footer-section">
                     <h4>Liens rapides</h4>
                     <ul>
                         <li><a href="index.html">Accueil</a></li>
                         <li><a href="formations.html">Formations</a></li>
-                        <li><a href="partenaires.html">Partenaires</a></li>
+                        <li><a href="projets.html">Projets</a></li>
                         <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contact@labmath.cm</li>
+                        <li><i class="fas fa-phone"></i> +237 620 307 439</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Yaoundé, Cameroun</li>
                     </ul>
                 </div>
             </div>
@@ -88,43 +270,250 @@
     </footer>
 
     <script src="config.js"></script>
-    <script src="script.js"></script>
     <script>
+        let allFormations = [];
+        let currentFilter = 'all';
+        
+        // Données de démonstration pour les formations
+        const demoFormations = [
+            {
+                id: 1,
+                titre: "Data Science Avancée avec Python",
+                description: "Maîtrisez les techniques avancées de data science",
+                description_complete: "Cette formation intensive de 3 mois couvre l'ensemble des techniques avancées en data science : machine learning, deep learning, big data, et déploiement de modèles. Les participants travailleront sur des projets concrets issus de cas réels.",
+                duree: "3 mois (120 heures)",
+                statut: "en-cours",
+                date_debut: "2025-01-15",
+                date_fin: "2025-04-15",
+                formateur: "Dr. Jean Mbarga",
+                programme: [
+                    "Introduction au Machine Learning",
+                    "Modèles supervisés et non supervisés",
+                    "Deep Learning avec TensorFlow",
+                    "Traitement du Big Data avec Spark",
+                    "Déploiement de modèles en production"
+                ],
+                prerequis: "Bases de Python et statistiques",
+                prix: "500 000 FCFA",
+                lieu: "Yaoundé (présentiel) / Online"
+            },
+            {
+                id: 2,
+                titre: "Mathématiques pour l'Intelligence Artificielle",
+                description: "Les fondements mathématiques de l'IA",
+                description_complete: "Formation complète sur les concepts mathématiques essentiels à l'IA : algèbre linéaire, calcul différentiel, probabilités et optimisation. Idéal pour les data scientists souhaitant approfondir leurs bases théoriques.",
+                duree: "2 mois (80 heures)",
+                statut: "termine",
+                date_debut: "2024-10-01",
+                date_fin: "2024-11-30",
+                formateur: "Pr. Marie Ngoa",
+                programme: [
+                    "Algèbre linéaire appliquée",
+                    "Calcul différentiel et optimisation",
+                    "Probabilités et statistiques",
+                    "Méthodes d'optimisation",
+                    "Applications en IA"
+                ],
+                prerequis: "Niveau Bac+2 scientifique",
+                prix: "350 000 FCFA",
+                lieu: "Douala"
+            },
+            {
+                id: 3,
+                titre: "Introduction à la Géomatique",
+                description: "Traitement et analyse de données spatiales",
+                description_complete: "Cette formation initie les participants aux outils et méthodes de la géomatique : SIG, traitement d'images satellites, analyse spatiale. Les participants réaliseront des projets concrets d'analyse territoriale.",
+                duree: "6 semaines (60 heures)",
+                statut: "planifiee",
+                date_debut: "2025-05-10",
+                date_fin: "2025-06-20",
+                formateur: "Ing. Paul Atangana",
+                programme: [
+                    "Introduction aux SIG (QGIS)",
+                    "Traitement d'images satellites",
+                    "Analyse spatiale avancée",
+                    "Modélisation 3D",
+                    "Projet final"
+                ],
+                prerequis: "Connaissances de base en informatique",
+                prix: "250 000 FCFA",
+                lieu: "En ligne"
+            }
+        ];
+        
         async function loadFormations() {
-            const container = document.getElementById('formations-container');
             try {
                 const response = await fetch('data.json?t=' + Date.now());
-                const data = await response.json();
-                const formations = data.formations || [];
-                
-                if (formations.length === 0) {
-                    container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>Aucune formation disponible pour le moment.</p></div>';
-                    return;
+                if (response.ok) {
+                    const data = await response.json();
+                    allFormations = [...(data.formations || []), ...demoFormations];
+                } else {
+                    const localData = localStorage.getItem('labmath_data');
+                    if (localData) {
+                        const data = JSON.parse(localData);
+                        allFormations = [...(data.formations || []), ...demoFormations];
+                    } else {
+                        allFormations = [...demoFormations];
+                    }
                 }
-                
-                container.innerHTML = formations.map(f => `
-                    <div class="math-card formation-card">
-                        <div class="formation-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <span class="formation-status status-${f.statut === 'Planifiée' ? 'planifiee' : (f.statut === 'En cours' ? 'encours' : 'termine')}">
-                                ${f.statut === 'Planifiée' ? '📅 À venir' : (f.statut === 'En cours' ? '🔄 En cours' : '✅ Terminé')}
-                            </span>
-                            <span style="font-size: 0.8rem; opacity: 0.6;">${f.duree || 'Durée non spécifiée'}</span>
-                        </div>
-                        <h3>${f.titre}</h3>
-                        <p>${f.description || 'Description à venir...'}</p>
-                        ${f.programme ? `<div style="margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.3); border-radius: 8px;"><small>📖 ${f.programme.substring(0, 150)}${f.programme.length > 150 ? '...' : ''}</small></div>` : ''}
-                        <div style="margin-top: 1rem; font-size: 0.8rem; opacity: 0.5;">
-                            <i class="fas fa-calendar"></i> Ajoutée le ${new Date(f.date_creation).toLocaleDateString('fr-FR')}
-                        </div>
-                    </div>
-                `).join('');
+                renderFormations();
             } catch (error) {
-                console.error('Erreur:', error);
-                container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>⚠️ Erreur de chargement des formations.</p></div>';
+                console.error('Erreur chargement:', error);
+                allFormations = [...demoFormations];
+                renderFormations();
             }
         }
         
-        document.addEventListener('DOMContentLoaded', loadFormations);
+        function renderFormations() {
+            const container = document.getElementById('formations-container');
+            if (!container) return;
+            
+            let filtered = allFormations;
+            if (currentFilter !== 'all') {
+                filtered = allFormations.filter(f => f.statut === currentFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">Aucune formation trouvée.</p>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(formation => `
+                <div class="math-card formation-card" onclick="openFormationModal(${JSON.stringify(formation).replace(/"/g, '&quot;')})">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                        <span class="realisation-categorie">${formation.duree || 'Durée non spécifiée'}</span>
+                        <span class="status-badge status-${formation.statut}">
+                            ${formation.statut === 'en-cours' ? 'En cours' : formation.statut === 'termine' ? 'Terminée' : 'Planifiée'}
+                        </span>
+                    </div>
+                    <h3>${formation.titre}</h3>
+                    <p>${truncateText(formation.description, 100)}</p>
+                    <div style="margin-top: 1rem; font-size: 0.85rem; opacity: 0.8;">
+                        <i class="fas fa-user"></i> ${formation.formateur || 'À déterminer'}
+                    </div>
+                    <div style="margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.8;">
+                        <i class="fas fa-calendar"></i> Du ${formatDate(formation.date_debut)} au ${formatDate(formation.date_fin)}
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <span class="tech-tag" style="background: var(--primary); color: var(--dark);">
+                            <i class="fas fa-info-circle"></i> Cliquez pour plus de détails
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openFormationModal(formation) {
+            const modal = document.getElementById('formationModal');
+            const modalContent = document.getElementById('formationModalContent');
+            
+            const getStatusText = (statut) => {
+                switch(statut) {
+                    case 'en-cours': return 'En cours';
+                    case 'termine': return 'Terminée';
+                    case 'planifiee': return 'Planifiée';
+                    default: return statut;
+                }
+            };
+            
+            modalContent.innerHTML = `
+                <h2><span class="gradient-text">${formation.titre}</span></h2>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-tag"></i> Statut</h4>
+                    <p><span class="status-badge status-${formation.statut}">${getStatusText(formation.statut)}</span></p>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-align-left"></i> Description</h4>
+                    <p>${formation.description_complete || formation.description}</p>
+                </div>
+                
+                <div class="detail-section">
+                    <h4><i class="fas fa-clock"></i> Informations pratiques</h4>
+                    <p><strong>Durée :</strong> ${formation.duree}</p>
+                    <p><strong>Dates :</strong> Du ${formatDate(formation.date_debut)} au ${formatDate(formation.date_fin)}</p>
+                    <p><strong>Formateur :</strong> ${formation.formateur || 'À déterminer'}</p>
+                    <p><strong>Lieu :</strong> ${formation.lieu || 'À préciser'}</p>
+                    ${formation.prix ? `<p><strong>Prix :</strong> ${formation.prix}</p>` : ''}
+                </div>
+                
+                ${formation.programme ? `
+                    <div class="detail-section">
+                        <h4><i class="fas fa-list-ol"></i> Programme détaillé</h4>
+                        <ul class="programme-list">
+                            ${formation.programme.map(item => `<li><i class="fas fa-check-circle"></i> ${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                ` : ''}
+                
+                ${formation.prerequis ? `
+                    <div class="detail-section">
+                        <h4><i class="fas fa-graduation-cap"></i> Prérequis</h4>
+                        <p>${formation.prerequis}</p>
+                    </div>
+                ` : ''}
+                
+                <div class="realisation-buttons" style="margin-top: 1.5rem;">
+                    <button onclick="closeFormationModal()" class="btn btn-outline">Fermer</button>
+                    <a href="contact.html" class="btn btn-primary">S'inscrire <i class="fas fa-arrow-right"></i></a>
+                </div>
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeFormationModal() {
+            const modal = document.getElementById('formationModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Date à définir';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        
+        function truncateText(text, maxLength = 100) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+        
+        // Événements filtres
+        function attachFilterEvents() {
+            const tabs = document.querySelectorAll('.filter-tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    currentFilter = tab.dataset.filter;
+                    renderFormations();
+                });
+            });
+        }
+        
+        // Navigation responsive
+        document.querySelector('.nav-toggle')?.addEventListener('click', () => {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFormations();
+            attachFilterEvents();
+            
+            // Fermer modal avec Echap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeFormationModal();
+            });
+            
+            // Fermer modal en cliquant à l'extérieur
+            document.getElementById('formationModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('formationModal')) closeFormationModal();
+            });
+        });
     </script>
 </body>
 </html>

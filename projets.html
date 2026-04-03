@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projets - Lab_Math | Laboratoire de Mathématiques Appliquées</title>
+    <meta name="description" content="Découvrez tous les projets réalisés par le laboratoire Lab_Math">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .projet-detail-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+        
+        .projet-detail-content {
+            background: linear-gradient(135deg, rgba(10, 10, 20, 0.98), rgba(5, 5, 15, 0.98));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            animation: modalSlideIn 0.3s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-modal:hover {
+            background: rgba(255, 0, 0, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .projet-detail-content h2 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .projet-detail-content .detail-section {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: rgba(0, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .projet-detail-content .detail-section h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+        
+        .filter-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active, .filter-btn:hover {
+            background: var(--primary);
+            color: var(--dark);
+            border-color: var(--primary);
+        }
+        
+        @media (max-width: 768px) {
+            .projet-detail-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+            
+            .projet-detail-content h2 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="math-particles"></div>
+    <div class="floating-formulas">
+        <span>∫</span><span>∑</span><span>∏</span><span>∇</span><span>∂</span><span>Δ</span>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">∑</div>
+                <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html" class="nav-link">Accueil</a></li>
+                <li><a href="about.html" class="nav-link">À propos</a></li>
+                <li><a href="index.html#services" class="nav-link">Services</a></li>
+                <li><a href="activites.html" class="nav-link">Activités</a></li>
+                <li><a href="projets.html" class="nav-link active">Projets</a></li>
+                <li><a href="formations.html" class="nav-link">Formations</a></li>
+                <li><a href="partenaires.html" class="nav-link">Partenaires</a></li>
+                <li><a href="annonces.html" class="nav-link">Annonces</a></li>
+                <li><a href="offres.html" class="nav-link">Offres</a></li>
+                <li><a href="contact.html" class="nav-link">Contact</a></li>
+                <li><a href="login.html" class="nav-link"><i class="fas fa-lock"></i> Admin</a></li>
+            </ul>
+            <button class="nav-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- Section Projets -->
+    <section class="section" style="padding-top: 100px;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Nos <span class="gradient-text">Projets Réalisés</span></h2>
+                <p class="section-subtitle">Découvrez l'ensemble de nos projets innovants</p>
+            </div>
+            
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">Tous</button>
+                <button class="filter-btn" data-filter="Géospatial">Géospatial</button>
+                <button class="filter-btn" data-filter="IA">Intelligence Artificielle</button>
+                <button class="filter-btn" data-filter="Data Science">Data Science</button>
+                <button class="filter-btn" data-filter="Robotique">Robotique</button>
+            </div>
+            
+            <div id="projets-container" class="math-grid">
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <div class="math-loader"></div>
+                    <p style="color: var(--primary);">Chargement des projets...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal détails projet -->
+    <div id="projetModal" class="projet-detail-modal">
+        <div class="projet-detail-content">
+            <button class="close-modal" onclick="closeProjetModal()"><i class="fas fa-times"></i></button>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <div class="logo-icon">∑</div>
+                        <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+                    </div>
+                    <p style="color: rgba(224,224,255,0.7);">Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens rapides</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="projets.html">Projets</a></li>
+                        <li><a href="formations.html">Formations</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><i class="fas fa-envelope"></i> contact@labmath.cm</li>
+                        <li><i class="fas fa-phone"></i> +237 620 307 439</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Yaoundé, Cameroun</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lab_Math. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script>
+        const DEMOS = {
+            carteInteractive: {
+                id: 'demo_carte',
+                titre: '📍 Carte interactive des densités de population',
+                description: 'Visualisation dynamique des disparités de population sur un territoire.',
+                description_complete: 'Cette carte interactive permet de visualiser les densités de population à différentes échelles. Les données proviennent de sources officielles et sont mises à jour annuellement. L\'outil permet d\'identifier les zones à forte concentration et d\'analyser les disparités territoriales pour l\'aide à la décision en matière d\'aménagement.',
+                categorie: 'Géospatial',
+                methodologie: 'Données OpenStreetMap & WorldPop, modélisation avec Python/Folium, export HTML interactif.',
+                technologies: ['Python', 'Folium', 'Leaflet', 'OpenStreetMap'],
+                demo_url: 'https://demo-labmath.netlify.app/carte',
+                github_url: 'https://github.com/labmath/carte-densite',
+                date_creation: '2024-01-15',
+                statut: 'Terminé',
+                est_publie: true,
+                est_demo: true
+            },
+            simulateurSIR: {
+                id: 'demo_sir',
+                titre: '🦠 Simulateur épidémique SIR',
+                description: 'Simulation interactive d\'une épidémie avec le modèle SIR.',
+                description_complete: 'Ce simulateur utilise le modèle compartimental SIR (Sains, Infectés, Guéris) pour modéliser la propagation d\'une épidémie. L\'utilisateur peut ajuster les paramètres de transmission (β) et de guérison (γ) en temps réel et observer l\'évolution des courbes. L\'outil est utile pour comprendre les dynamiques épidémiques et tester différentes stratégies de confinement.',
+                categorie: 'Modélisation',
+                methodologie: 'Modèle compartimental d\'équations différentielles, simulation JavaScript, visualisation Chart.js.',
+                technologies: ['JavaScript', 'Chart.js', 'HTML/CSS', 'Modèle SIR'],
+                demo_url: 'https://demo-labmath.netlify.app/sir',
+                github_url: 'https://github.com/labmath/simulateur-sir',
+                date_creation: '2024-02-20',
+                statut: 'Terminé',
+                est_publie: true,
+                est_demo: true
+            }
+        };
+
+        let allProjets = [];
+
+        async function loadProjets() {
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    allProjets = [...(data.realisations || []), DEMOS.carteInteractive, DEMOS.simulateurSIR];
+                } else {
+                    const localData = localStorage.getItem('labmath_data');
+                    if (localData) {
+                        const data = JSON.parse(localData);
+                        allProjets = [...(data.realisations || []), DEMOS.carteInteractive, DEMOS.simulateurSIR];
+                    } else {
+                        allProjets = [DEMOS.carteInteractive, DEMOS.simulateurSIR];
+                    }
+                }
+                renderProjets(allProjets.filter(p => p.est_publie === true));
+            } catch (error) {
+                console.error('Erreur chargement:', error);
+                allProjets = [DEMOS.carteInteractive, DEMOS.simulateurSIR];
+                renderProjets(allProjets);
+            }
+        }
+
+        function renderProjets(projets) {
+            const container = document.getElementById('projets-container');
+            if (!container) return;
+            
+            if (projets.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">Aucun projet trouvé.</p>';
+                return;
+            }
+            
+            container.innerHTML = projets.map(projet => `
+                <div class="math-card glow-card" data-categorie="${projet.categorie || 'Autre'}">
+                    <div class="realisation-header">
+                        <span class="realisation-categorie">${projet.categorie || 'Projet'}</span>
+                        <span class="realisation-date">${formatDate(projet.date_creation)}</span>
+                        ${projet.est_demo ? '<span class="demo-badge">🎯 Démo interactive</span>' : ''}
+                    </div>
+                    <h3>${projet.titre}</h3>
+                    <p>${truncateText(projet.description, 120)}</p>
+                    ${projet.technologies ? `
+                        <div class="realisation-techs">
+                            ${projet.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="realisation-buttons">
+                        <button onclick="openProjetModal(${JSON.stringify(projet).replace(/"/g, '&quot;')})" class="btn btn-outline btn-small">
+                            <i class="fas fa-info-circle"></i> Voir détails
+                        </button>
+                        ${projet.demo_url ? `
+                            <a href="${projet.demo_url}" target="_blank" class="btn btn-primary btn-small">
+                                <i class="fas fa-external-link-alt"></i> Voir la démo
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+            
+            // Appliquer les filtres
+            attachFilterEvents();
+        }
+        
+        function attachFilterEvents() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            filterBtns.forEach(btn => {
+                btn.removeEventListener('click', handleFilter);
+                btn.addEventListener('click', handleFilter);
+            });
+        }
+        
+        function handleFilter(e) {
+            const filter = e.target.dataset.filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            let filtered = allProjets.filter(p => p.est_publie === true);
+            if (filter !== 'all') {
+                filtered = filtered.filter(p => p.categorie === filter);
+            }
+            renderProjetsFiltered(filtered);
+        }
+        
+        function renderProjetsFiltered(projets) {
+            const container = document.getElementById('projets-container');
+            if (projets.length === 0) {
+                container.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">Aucun projet dans cette catégorie.</p>';
+                return;
+            }
+            
+            container.innerHTML = projets.map(projet => `
+                <div class="math-card glow-card">
+                    <div class="realisation-header">
+                        <span class="realisation-categorie">${projet.categorie || 'Projet'}</span>
+                        <span class="realisation-date">${formatDate(projet.date_creation)}</span>
+                        ${projet.est_demo ? '<span class="demo-badge">🎯 Démo interactive</span>' : ''}
+                    </div>
+                    <h3>${projet.titre}</h3>
+                    <p>${truncateText(projet.description, 120)}</p>
+                    ${projet.technologies ? `
+                        <div class="realisation-techs">
+                            ${projet.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                    <div class="realisation-buttons">
+                        <button onclick="openProjetModal(${JSON.stringify(projet).replace(/"/g, '&quot;')})" class="btn btn-outline btn-small">
+                            <i class="fas fa-info-circle"></i> Voir détails
+                        </button>
+                        ${projet.demo_url ? `
+                            <a href="${projet.demo_url}" target="_blank" class="btn btn-primary btn-small">
+                                <i class="fas fa-external-link-alt"></i> Voir la démo
+                            </a>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function openProjetModal(projet) {
+            const modal = document.getElementById('projetModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            modalContent.innerHTML = `
+                <h2><span class="gradient-text">${projet.titre}</span></h2>
+                <div class="detail-section">
+                    <h4><i class="fas fa-tag"></i> Catégorie</h4>
+                    <p>${projet.categorie || 'Non catégorisé'}</p>
+                </div>
+                <div class="detail-section">
+                    <h4><i class="fas fa-calendar"></i> Date</h4>
+                    <p>${formatDate(projet.date_creation)}</p>
+                </div>
+                <div class="detail-section">
+                    <h4><i class="fas fa-align-left"></i> Description complète</h4>
+                    <p>${projet.description_complete || projet.description}</p>
+                </div>
+                ${projet.methodologie ? `
+                    <div class="detail-section">
+                        <h4><i class="fas fa-flask"></i> Méthodologie</h4>
+                        <p>${projet.methodologie}</p>
+                    </div>
+                ` : ''}
+                ${projet.technologies ? `
+                    <div class="detail-section">
+                        <h4><i class="fas fa-code"></i> Technologies utilisées</h4>
+                        <div class="realisation-techs">
+                            ${projet.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+                <div class="detail-section">
+                    <h4><i class="fas fa-chart-line"></i> Statut</h4>
+                    <p><span class="status-badge ${projet.statut === 'Terminé' ? 'status-published' : 'status-draft'}">${projet.statut || 'Terminé'}</span></p>
+                </div>
+                ${projet.demo_url || projet.github_url ? `
+                    <div class="realisation-buttons" style="margin-top: 1.5rem;">
+                        ${projet.demo_url ? `<a href="${projet.demo_url}" target="_blank" class="btn btn-primary"><i class="fas fa-external-link-alt"></i> Accéder à la démo</a>` : ''}
+                        ${projet.github_url ? `<a href="${projet.github_url}" target="_blank" class="btn btn-outline"><i class="fab fa-github"></i> Voir le code source</a>` : ''}
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeProjetModal() {
+            const modal = document.getElementById('projetModal');
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        function formatDate(dateString) {
+            if (!dateString) return 'Récemment';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+        
+        function truncateText(text, maxLength = 100) {
+            if (!text) return '';
+            return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
+        }
+        
+        // Navigation responsive
+        document.querySelector('.nav-toggle')?.addEventListener('click', () => {
+            document.querySelector('.nav-menu').classList.toggle('active');
+        });
+        
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProjets();
+            
+            // Fermer modal avec Echap
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeProjetModal();
+            });
+            
+            // Fermer modal en cliquant à l'extérieur
+            document.getElementById('projetModal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('projetModal')) closeProjetModal();
+            });
+        });
+    </script>
+</body>
+</html>
