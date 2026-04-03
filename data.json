@@ -1,9 +1,30 @@
 {
-  "activites": [],
+  "activites": [
+    {
+      "titre": "Elaboration de Appview_PresentationPremplus",
+      "description": "Application de génération intelligente des présentations power point: https://huggingface.co/spaces/sohfossted/Generator_presentationV2.3Prem",
+      "image_url": "https://huggingface.co/spaces/sohfossted/App_v02Presentationsgenerator_Prem",
+      "date_creation": "2026-04-03T20:18:36.040Z",
+      "est_publie": true,
+      "contenu": "contient le lient de l'application",
+      "auteur": "Admin",
+      "id": "id_1775247516040"
+    }
+  ],
   "realisations": [],
   "annonces": [],
   "offres": [],
   "messages": [],
   "formations": [],
-  "partenaires": []
+  "partenaires": [],
+  "compteurs": {
+    "activites": 1,
+    "realisations": 0,
+    "annonces": 0,
+    "offres": 0,
+    "messages": 0,
+    "formations": 0,
+    "partenaires": 0
+  },
+  "last_update": "2026-04-03T20:18:42.608Z"
 }
