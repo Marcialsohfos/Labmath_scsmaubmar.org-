@@ -1,11 +1,11 @@
-// ===== LAB_MATH - CORE SCRIPT (VERSION AMÉLIORÉE AVEC FORMATIONS & PARTENAIRES) =====
+// ===== LAB_MATH - CORE SCRIPT (VERSION COMPLÈTE CORRIGÉE) =====
 
 // 1. CONFIGURATION
 const DATA_FILE = 'data.json';
 const LOCAL_STORAGE_KEY = 'labmath_data';
 const equations = ['E = mc²', '∫ f(x) dx', '∑ n²', '∇ × F', '∂u/∂t', 'lim x→0', '∏ k=1', '√(x²+y²)', 'e^{iπ} + 1 = 0', 'Δx Δp ≥ ħ/2'];
 
-// ===== CONFIGURATION DES DÉMOS (À MODIFIER AVEC VOS VRAIS LIENS) =====
+// ===== CONFIGURATION DES DÉMOS (À MODIFIER AVEC VOS VRAIS LIENS NETLIFY) =====
 const DEMOS = {
     carteInteractive: {
         id: 'demo_carte',
@@ -80,7 +80,7 @@ function animateNumber(element, target) {
     }, 16);
 }
 
-// ===== CHARGEMENT DES DONNÉES (LOGICIENNE HYBRIDE) =====
+// ===== CHARGEMENT DES DONNÉES =====
 
 async function loadAllAppData() {
     try {
@@ -92,7 +92,6 @@ async function loadAllAppData() {
     } catch (error) {
         const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (localData) return JSON.parse(localData);
-        // Structure par défaut avec toutes les sections
         return { 
             activites: [], 
             realisations: [], 
@@ -100,18 +99,17 @@ async function loadAllAppData() {
             offres: [], 
             messages: [],
             formations: [],
-            partenaires: [],
-            compteurs: { activites: 0, realisations: 0, annonces: 0, offres: 0, messages: 0, formations: 0, partenaires: 0 }
+            partenaires: []
         };
     }
 }
 
-// ===== MISE À JOUR DES COMPTEURS AUTOMATIQUES (PAGE D'ACCUEIL) =====
+// ===== MISE À JOUR DES COMPTEURS AUTOMATIQUES (POUR LA PAGE D'ACCUEIL) =====
 
-async function updateStatCounters() {
+async function updateHomepageCounters() {
     const data = await loadAllAppData();
     
-    // Compter les éléments (réalisations du JSON + démos)
+    // Compter les projets (réalisations JSON + démos)
     const realisationsExistantes = data.realisations || [];
     const tousProjets = [...realisationsExistantes, DEMOS.carteInteractive, DEMOS.simulateurSIR];
     const projetsCount = tousProjets.length;
@@ -120,28 +118,47 @@ async function updateStatCounters() {
     const formationsCount = (data.formations || []).length;
     const partenairesCount = (data.partenaires || []).length;
     
-    // Mettre à jour les compteurs dans le HTML
-    const statNumbers = document.querySelectorAll('.stat-number');
-    if (statNumbers.length >= 3) {
-        animateNumber(statNumbers[0], projetsCount);
-        animateNumber(statNumbers[1], formationsCount);
-        animateNumber(statNumbers[2], partenairesCount);
-    }
+    console.log('Mise à jour compteurs - Projets:', projetsCount, 'Formations:', formationsCount, 'Partenaires:', partenairesCount);
     
-    // Mettre à jour l'attribut data-target
-    if (statNumbers[0]) statNumbers[0].setAttribute('data-target', projetsCount);
-    if (statNumbers[1]) statNumbers[1].setAttribute('data-target', formationsCount);
-    if (statNumbers[2]) statNumbers[2].setAttribute('data-target', partenairesCount);
+    // Chercher les éléments par sélecteurs plus flexibles
+    const allStatNumbers = document.querySelectorAll('.stat-number');
+    
+    if (allStatNumbers.length >= 3) {
+        // Premier compteur (Projets réalisés)
+        animateNumber(allStatNumbers[0], projetsCount);
+        // Deuxième compteur (Formations)
+        animateNumber(allStatNumbers[1], formationsCount);
+        // Troisième compteur (Partenaires)
+        animateNumber(allStatNumbers[2], partenairesCount);
+    } else {
+        // Fallback: chercher par conteneur parent
+        const statItems = document.querySelectorAll('.stat-item');
+        if (statItems.length >= 3) {
+            const projetStat = statItems[0].querySelector('.stat-number');
+            const formationStat = statItems[1].querySelector('.stat-number');
+            const partenaireStat = statItems[2].querySelector('.stat-number');
+            
+            if (projetStat) animateNumber(projetStat, projetsCount);
+            if (formationStat) animateNumber(formationStat, formationsCount);
+            if (partenaireStat) animateNumber(partenaireStat, partenairesCount);
+        }
+    }
 }
 
-// ===== RENDU : INTERFACE PUBLIQUE =====
+// ===== RENDU : INTERFACE PUBLIQUE (VITRINE) =====
 
 async function renderActivites() {
     const container = document.getElementById('activites-container');
-    if (!container) return;
+    if (!container) {
+        console.log('Container activites-container non trouvé');
+        return;
+    }
+    
     const data = await loadAllAppData();
     const activites = data.activites || [];
     const publiees = activites.filter(a => String(a.est_publie) === "true");
+
+    console.log('Affichage activités:', publiees.length);
 
     if (publiees.length === 0) {
         container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucune activité publiée.</p>';
@@ -151,8 +168,8 @@ async function renderActivites() {
     container.innerHTML = publiees.map(act => `
         <div class="math-card">
             <div style="font-size: 1.5rem; color: var(--primary);">∫</div>
-            <h3>${act.titre}</h3>
-            <p>${truncateText(act.description, 120)}</p>
+            <h3>${escapeHtml(act.titre)}</h3>
+            <p>${truncateText(escapeHtml(act.description), 120)}</p>
             <div style="margin-top:1rem; font-size:0.8rem; opacity:0.7;">
                 <i class="fas fa-calendar"></i> ${formatDate(act.date_creation)}
             </div>
@@ -160,11 +177,12 @@ async function renderActivites() {
     `).join('');
 }
 
-// ===== RENDU DES RÉALISATIONS (AVEC DÉMOS INTÉGRÉES) =====
-
 async function renderRealisations() {
     const container = document.getElementById('realisations-container');
-    if (!container) return;
+    if (!container) {
+        console.log('Container realisations-container non trouvé');
+        return;
+    }
     
     const data = await loadAllAppData();
     const realisationsExistantes = data.realisations || [];
@@ -178,6 +196,8 @@ async function renderRealisations() {
     
     const publiees = toutesLesRealisations.filter(r => r.est_publie === true);
     
+    console.log('Affichage réalisations:', publiees.length);
+    
     if (publiees.length === 0) {
         container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; opacity:0.6;">Aucune réalisation publiée.</p>';
         return;
@@ -186,20 +206,20 @@ async function renderRealisations() {
     container.innerHTML = publiees.map(projet => `
         <div class="math-card glow-card realisation-card">
             <div class="realisation-header">
-                <span class="realisation-categorie">${projet.categorie || 'Projet'}</span>
+                <span class="realisation-categorie">${escapeHtml(projet.categorie || 'Projet')}</span>
                 <span class="realisation-date">${formatDate(projet.date_creation)}</span>
                 ${projet.est_demo ? '<span class="demo-badge">🎯 Démo interactive</span>' : ''}
             </div>
-            <h3>${projet.titre}</h3>
-            <p>${truncateText(projet.description, 120)}</p>
+            <h3>${escapeHtml(projet.titre)}</h3>
+            <p>${truncateText(escapeHtml(projet.description), 120)}</p>
             ${projet.methodologie ? `
                 <div class="realisation-methodo">
-                    <small><strong>Méthode :</strong> ${truncateText(projet.methodologie, 100)}</small>
+                    <small><strong>Méthode :</strong> ${truncateText(escapeHtml(projet.methodologie), 100)}</small>
                 </div>
             ` : ''}
             ${projet.technologies ? `
                 <div class="realisation-techs">
-                    ${projet.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
+                    ${projet.technologies.map(tech => `<span class="tech-tag">${escapeHtml(tech)}</span>`).join('')}
                 </div>
             ` : ''}
             <div class="realisation-buttons">
@@ -218,6 +238,14 @@ async function renderRealisations() {
     `).join('');
 }
 
+// Fonction utilitaire pour échapper le HTML
+function escapeHtml(text) {
+    if (!text) return '';
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
 // ===== RENDU : INTERFACE ADMIN =====
 
 async function renderAdminActivites() {
@@ -228,29 +256,28 @@ async function renderAdminActivites() {
     const activites = data.activites || [];
 
     if (activites.length === 0) {
-        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune activité enregistrée. </td></tr>';
+        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune activité enregistrée. </div> </div> ');
         return;
     }
 
     container.innerHTML = activites.map(act => `
         <tr>
-            <td><strong>${act.titre}</strong></td>
-            <td>${formatDate(act.date_creation)}</td>
+            <td><strong>${escapeHtml(act.titre)}</strong> </div>
+            <td>${formatDate(act.date_creation)}</div>
             <td><span class="status-badge ${act.est_publie ? 'status-published' : 'status-draft'}">
                 ${act.est_publie ? 'Publié' : 'Brouillon'}
-            </span></td>
+            </span> </div>
             <td>
                 <div style="display:flex; gap:10px;">
                     <button class="action-btn delete" onclick="deleteActivity(${act.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-            </td>
-        </tr>
+             </div>
+         ');
     `).join('');
 }
 
-// Admin Réalisations
 async function renderAdminRealisations() {
     const container = document.getElementById('admin-realisations-list');
     if (!container) return;
@@ -265,8 +292,8 @@ async function renderAdminRealisations() {
 
     container.innerHTML = realisations.map(proj => `
         <tr>
-            <td><strong>${proj.titre}</strong>  </div>
-            <td>${proj.categorie || 'Non catégorisé'}  </div>
+            <td><strong>${escapeHtml(proj.titre)}</strong>  </div>
+            <td>${escapeHtml(proj.categorie || 'Non catégorisé')}  </div>
             <td>${formatDate(proj.date_creation)}</div>
             <td>
                 <div style="display:flex; gap:10px;">
@@ -279,7 +306,6 @@ async function renderAdminRealisations() {
     `).join('');
 }
 
-// Admin Formations
 async function renderAdminFormations() {
     const container = document.getElementById('admin-formations-list');
     if (!container) return;
@@ -294,10 +320,10 @@ async function renderAdminFormations() {
 
     container.innerHTML = formations.map(formation => `
         <tr>
-            <td><strong>${formation.titre}</strong>  </div>
-            <td>${formation.duree || 'Non spécifiée'} </div>
+            <td><strong>${escapeHtml(formation.titre)}</strong>  </div>
+            <td>${escapeHtml(formation.duree || 'Non spécifiée')} </div>
             <td><span class="status-badge ${formation.statut === 'Terminé' ? 'status-published' : (formation.statut === 'En cours' ? 'status-active' : 'status-draft')}">
-                ${formation.statut || 'Planifiée'}
+                ${escapeHtml(formation.statut || 'Planifiée')}
             </span> </div>
             <td>
                 <div style="display:flex; gap:10px;">
@@ -310,7 +336,6 @@ async function renderAdminFormations() {
     `).join('');
 }
 
-// Admin Partenaires
 async function renderAdminPartenaires() {
     const container = document.getElementById('admin-partenaires-list');
     if (!container) return;
@@ -319,14 +344,14 @@ async function renderAdminPartenaires() {
     const partenaires = data.partenaires || [];
 
     if (partenaires.length === 0) {
-        container.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun partenaire enregistré. </div> </div> ');
+        container.innerHTML = '<td><td colspan="3" style="text-align:center;">Aucun partenaire enregistré. </div> </div> ');
         return;
     }
 
     container.innerHTML = partenaires.map(part => `
         <tr>
-            <td><strong>${part.nom}</strong>  </div>
-            <td>${part.type || 'Partenariat'} </div>
+            <td><strong>${escapeHtml(part.nom)}</strong>  </div>
+            <td>${escapeHtml(part.type || 'Partenariat')} </div>
             <td>
                 <div style="display:flex; gap:10px;">
                     <button class="action-btn delete" onclick="deletePartenaire(${part.id})">
@@ -337,8 +362,6 @@ async function renderAdminPartenaires() {
          ');
     `).join('');
 }
-
-// ===== GESTION DES MESSAGES (ADMIN) =====
 
 function renderAdminMessages() {
     const container = document.getElementById('messages-list');
@@ -362,12 +385,12 @@ function renderAdminMessages() {
         <div class="math-card" style="border-left: 4px solid ${msg.lu ? 'rgba(255,255,255,0.1)' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
             <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
-                    <h4 style="color: var(--primary); margin-bottom: 5px;">${msg.sujet}</h4>
-                    <small style="color: rgba(255,255,255,0.5);">De: <strong>${msg.nom}</strong> (${msg.email})</small>
+                    <h4 style="color: var(--primary); margin-bottom: 5px;">${escapeHtml(msg.sujet)}</h4>
+                    <small style="color: rgba(255,255,255,0.5);">De: <strong>${escapeHtml(msg.nom)}</strong> (${escapeHtml(msg.email)})</small>
                 </div>
                 ${!msg.lu ? '<span class="status-badge status-published">Nouveau</span>' : ''}
             </div>
-            <p style="margin: 15px 0; line-height: 1.6; white-space: pre-wrap;">${msg.contenu}</p>
+            <p style="margin: 15px 0; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(msg.contenu)}</p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-sm ${msg.lu ? 'btn-outline' : 'btn-primary'}" onclick="toggleRead(${msg.id})">
                     <i class="fas ${msg.lu ? 'fa-envelope-open' : 'fa-check'}"></i>
@@ -400,7 +423,7 @@ window.saveNewRealisation = function(event) {
     
     data.realisations.push({
         id: Date.now(),
-        titre,
+        titre: titre,
         description: desc,
         categorie: categorie || 'Non catégorisé',
         demo_url: demoUrl || '',
@@ -414,8 +437,8 @@ window.saveNewRealisation = function(event) {
     closeModal('modal-realisation');
     showAlert('success', 'Réalisation ajoutée ! Téléchargez le JSON pour GitHub.');
     renderAdminRealisations();
-    renderRealisations();
-    updateStatCounters();
+    if (typeof renderRealisations === 'function') renderRealisations();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
 };
 
 window.saveNewFormation = function(event) {
@@ -424,6 +447,7 @@ window.saveNewFormation = function(event) {
     const duree = document.getElementById('form-duree')?.value;
     const statut = document.getElementById('form-statut')?.value;
     const programme = document.getElementById('form-programme')?.value;
+    const description = document.getElementById('form-desc')?.value;
     
     if(!titre) {
         showAlert('error', 'Le titre est obligatoire !');
@@ -435,8 +459,8 @@ window.saveNewFormation = function(event) {
     
     data.formations.push({
         id: Date.now(),
-        titre,
-        description: document.getElementById('form-desc')?.value || '',
+        titre: titre,
+        description: description || '',
         duree: duree || 'Non spécifiée',
         statut: statut || 'Planifiée',
         programme: programme || '',
@@ -447,7 +471,7 @@ window.saveNewFormation = function(event) {
     closeModal('modal-formation');
     showAlert('success', 'Formation ajoutée !');
     renderAdminFormations();
-    updateStatCounters();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
 };
 
 window.saveNewPartenaire = function(event) {
@@ -478,7 +502,7 @@ window.saveNewPartenaire = function(event) {
     closeModal('modal-partenaire');
     showAlert('success', 'Partenaire ajouté !');
     renderAdminPartenaires();
-    updateStatCounters();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
 };
 
 window.deleteRealisation = function(id) {
@@ -487,8 +511,8 @@ window.deleteRealisation = function(id) {
     data.realisations = data.realisations.filter(r => r.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     renderAdminRealisations();
-    renderRealisations();
-    updateStatCounters();
+    if (typeof renderRealisations === 'function') renderRealisations();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
     showAlert('success', 'Réalisation supprimée');
 };
 
@@ -498,7 +522,7 @@ window.deleteFormation = function(id) {
     data.formations = data.formations.filter(f => f.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     renderAdminFormations();
-    updateStatCounters();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
     showAlert('success', 'Formation supprimée');
 };
 
@@ -508,7 +532,7 @@ window.deletePartenaire = function(id) {
     data.partenaires = data.partenaires.filter(p => p.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     renderAdminPartenaires();
-    updateStatCounters();
+    if (typeof updateHomepageCounters === 'function') updateHomepageCounters();
     showAlert('success', 'Partenaire supprimé');
 };
 
@@ -518,6 +542,7 @@ window.openModal = (id) => {
     const modal = document.getElementById(id);
     if (modal) modal.style.display = 'flex';
 };
+
 window.closeModal = (id) => { 
     const modal = document.getElementById(id);
     if (modal) modal.style.display = 'none';
@@ -543,7 +568,7 @@ window.saveNewActivity = function(event) {
     
     data.activites.push({
         id: Date.now(),
-        titre,
+        titre: titre,
         description: desc,
         date_creation: new Date().toISOString(),
         est_publie: true,
@@ -554,7 +579,7 @@ window.saveNewActivity = function(event) {
     closeModal('modal-activite');
     showAlert('success', 'Activité ajoutée ! Téléchargez le JSON pour GitHub.');
     renderAdminActivites();
-    renderActivites();
+    if (typeof renderActivites === 'function') renderActivites();
 };
 
 window.deleteActivity = function(id) {
@@ -563,7 +588,7 @@ window.deleteActivity = function(id) {
     data.activites = data.activites.filter(a => a.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     renderAdminActivites();
-    renderActivites();
+    if (typeof renderActivites === 'function') renderActivites();
 };
 
 window.toggleRead = function(id) {
@@ -597,26 +622,36 @@ window.downloadData = function() {
 // ===== INITIALISATION =====
 
 document.addEventListener('DOMContentLoaded', async () => {
+    console.log('DOM chargé - Initialisation Lab_Math');
     createMathBackground();
     
-    // Charger les données une fois au début
+    // Charger les données
     await loadAllAppData();
 
-    // Mettre à jour les compteurs automatiques (page d'accueil uniquement)
-    if (document.querySelector('.stat-number')) {
-        await updateStatCounters();
+    // Mettre à jour les compteurs (page d'accueil)
+    if (document.querySelector('.stat-number') || document.querySelector('.stat-item')) {
+        await updateHomepageCounters();
     }
     
-    // Rendu automatique selon la page
-    if (document.getElementById('activites-container')) renderActivites();
-    if (document.getElementById('realisations-container')) renderRealisations();
+    // Rendu des sections publiques (vitrine)
+    if (document.getElementById('activites-container')) {
+        console.log('Rendu des activités');
+        await renderActivites();
+    }
+    if (document.getElementById('realisations-container')) {
+        console.log('Rendu des réalisations');
+        await renderRealisations();
+    }
     
-    // Admin (uniquement si les conteneurs existent)
-    if (document.getElementById('admin-activites-list')) renderAdminActivites();
-    if (document.getElementById('admin-realisations-list')) renderAdminRealisations();
-    if (document.getElementById('admin-formations-list')) renderAdminFormations();
-    if (document.getElementById('admin-partenaires-list')) renderAdminPartenaires();
-    if (document.getElementById('messages-list')) renderAdminMessages();
+    // Rendu des sections admin (si on est sur la page admin)
+    if (document.getElementById('admin-activites-list')) {
+        console.log('Mode admin - chargement des listes');
+        renderAdminActivites();
+        renderAdminRealisations();
+        renderAdminFormations();
+        renderAdminPartenaires();
+        renderAdminMessages();
+    }
 
     // Année automatique
     const yearEl = document.getElementById('currentYear');
