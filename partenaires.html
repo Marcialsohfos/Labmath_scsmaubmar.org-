@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Partenaires - Lab_Math</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .partenaire-card {
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .partenaire-card:hover {
+            transform: translateY(-5px);
+        }
+        .partenaire-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        .partenaire-type {
+            display: inline-block;
+            padding: 0.2rem 0.8rem;
+            background: rgba(0, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.7rem;
+            color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="math-particles"></div>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <div class="logo-icon">∑</div>
+                <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="index.html">Accueil</a></li>
+                <li><a href="about.html">À propos</a></li>
+                <li><a href="formations.html">Formations</a></li>
+                <li><a href="partenaires.html" class="active">Partenaires</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header">
+                <h1 class="section-title">🤝 Nos <span class="gradient-text">Partenaires</span></h1>
+                <p class="section-subtitle">Ils nous font confiance et contribuent à notre rayonnement</p>
+            </div>
+            <div id="partenaires-container" class="math-grid">
+                <div class="text-center" style="grid-column: 1/-1;">
+                    <div class="math-loader"></div>
+                    <p style="color: var(--primary);">Chargement des partenaires...</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo" style="margin-bottom: 1rem;">
+                        <div class="logo-icon">∑</div>
+                        <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
+                    </div>
+                    <p>Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Liens rapides</h4>
+                    <ul>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="formations.html">Formations</a></li>
+                        <li><a href="partenaires.html">Partenaires</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Lab_Math. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        async function loadPartenaires() {
+            const container = document.getElementById('partenaires-container');
+            try {
+                const response = await fetch('data.json?t=' + Date.now());
+                const data = await response.json();
+                const partenaires = data.partenaires || [];
+                
+                if (partenaires.length === 0) {
+                    container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>Aucun partenaire enregistré pour le moment.</p></div>';
+                    return;
+                }
+                
+                const typeIcons = {
+                    'Partenariat stratégique': '🎯',
+                    'Partenariat académique': '🎓',
+                    'Partenariat institutionnel': '🏛️',
+                    'Mécénat': '💝',
+                    'Sponsoring': '⭐'
+                };
+                
+                container.innerHTML = partenaires.map(p => `
+                    <div class="math-card partenaire-card">
+                        <div class="partenaire-icon">${typeIcons[p.type] || '🤝'}</div>
+                        <h3>${p.nom}</h3>
+                        <span class="partenaire-type">${p.type || 'Partenariat'}</span>
+                        ${p.description ? `<p style="margin-top: 1rem; font-size: 0.9rem;">${p.description}</p>` : ''}
+                        ${p.site_web ? `<a href="${p.site_web}" target="_blank" class="btn btn-outline btn-small" style="margin-top: 1rem;">Visiter le site <i class="fas fa-external-link-alt"></i></a>` : ''}
+                        <div style="margin-top: 1rem; font-size: 0.7rem; opacity: 0.4;">
+                            Partenaire depuis ${new Date(p.date_creation).toLocaleDateString('fr-FR')}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('Erreur:', error);
+                container.innerHTML = '<div class="text-center" style="grid-column: 1/-1;"><p>⚠️ Erreur de chargement des partenaires.</p></div>';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadPartenaires);
+    </script>
+</body>
+</html>
