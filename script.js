@@ -5,23 +5,33 @@ const DATA_FILE = 'data.json';
 const LOCAL_STORAGE_KEY = 'labmath_data';
 const equations = ['E = mc²', '∫ f(x) dx', '∑ n²', '∇ × F', '∂u/∂t', 'lim x→0', '∏ k=1', '√(x²+y²)', 'e^{iπ} + 1 = 0', 'Δx Δp ≥ ħ/2'];
 
-// Configuration des démos (À MODIFIER AVEC VOS VRAIS LIENS)
+// ===== CONFIGURATION DES DÉMOS (À MODIFIER AVEC VOS VRAIS LIENS) =====
 const DEMOS = {
     carteInteractive: {
-        url: 'https://votre-nom.netlify.app/carte_densite',
-        github: 'https://github.com/votre-compte/carte-densite-labmath',
+        id: 'demo_carte',
         titre: '📍 Carte interactive des densités de population',
-        description: 'Visualisation dynamique des disparités de population sur un territoire.',
+        description: 'Visualisation dynamique des disparités de population sur un territoire. Carte avec cercles proportionnels pour l\'analyse territoriale et l\'aide à la décision.',
         categorie: 'Géospatial',
-        technologies: ['Python', 'Folium', 'Leaflet']
+        methodologie: 'Données OpenStreetMap & WorldPop, modélisation avec Python/Folium, export HTML interactif.',
+        technologies: ['Python', 'Folium', 'Leaflet', 'OpenStreetMap'],
+        demo_url: 'https://votre-nom.netlify.app/carte_densite',
+        github_url: 'https://github.com/votre-compte/carte-densite-labmath',
+        date_creation: new Date().toISOString(),
+        est_publie: true,
+        est_demo: true
     },
     simulateurSIR: {
-        url: 'https://votre-nom.netlify.app/simulateur_sir',
-        github: 'https://github.com/votre-compte/simulateur-sir-labmath',
-        titre: '🦠 Simulateur épidémique SIR',
-        description: 'Simulation interactive d\'une épidémie avec le modèle SIR (Sains, Infectés, Guéris).',
+        id: 'demo_sir',
+        titre: '🦠 Simulateur épidémique SIR (interactif)',
+        description: 'Simulation interactive d\'une épidémie avec le modèle SIR (Sains, Infectés, Guéris). Curseurs temps réel pour observer l\'impact des paramètres de contamination et guérison.',
         categorie: 'Modélisation',
-        technologies: ['JavaScript', 'Chart.js', 'HTML/CSS']
+        methodologie: 'Modèle compartimental d\'équations différentielles, simulation JavaScript, visualisation Chart.js.',
+        technologies: ['JavaScript', 'Chart.js', 'HTML/CSS', 'Modèle SIR'],
+        demo_url: 'https://votre-nom.netlify.app/simulateur_sir',
+        github_url: 'https://github.com/votre-compte/simulateur-sir-labmath',
+        date_creation: new Date().toISOString(),
+        est_publie: true,
+        est_demo: true
     }
 };
 
@@ -70,7 +80,7 @@ function animateNumber(element, target) {
     }, 16);
 }
 
-// ===== CHARGEMENT DES DONNÉES (LOGIQUE HYBRIDE) =====
+// ===== CHARGEMENT DES DONNÉES (LOGICIENNE HYBRIDE) =====
 
 async function loadAllAppData() {
     try {
@@ -82,7 +92,7 @@ async function loadAllAppData() {
     } catch (error) {
         const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
         if (localData) return JSON.parse(localData);
-        // Structure par défaut avec les sections nécessaires
+        // Structure par défaut avec toutes les sections
         return { 
             activites: [], 
             realisations: [], 
@@ -90,7 +100,8 @@ async function loadAllAppData() {
             offres: [], 
             messages: [],
             formations: [],
-            partenaires: []
+            partenaires: [],
+            compteurs: { activites: 0, realisations: 0, annonces: 0, offres: 0, messages: 0 }
         };
     }
 }
@@ -100,8 +111,12 @@ async function loadAllAppData() {
 async function updateStatCounters() {
     const data = await loadAllAppData();
     
-    // Compter les éléments
-    const projetsCount = (data.realisations || []).length;
+    // Compter les éléments (réalisations du JSON + démos)
+    const realisationsExistantes = data.realisations || [];
+    const tousProjets = [...realisationsExistantes, DEMOS.carteInteractive, DEMOS.simulateurSIR];
+    const projetsCount = tousProjets.length;
+    
+    // Formations et partenaires (à créer dans data.json)
     const formationsCount = (data.formations || []).length;
     const partenairesCount = (data.partenaires || []).length;
     
@@ -112,6 +127,11 @@ async function updateStatCounters() {
         animateNumber(statNumbers[1], formationsCount);
         animateNumber(statNumbers[2], partenairesCount);
     }
+    
+    // Mettre à jour l'attribut data-target pour référence future
+    if (statNumbers[0]) statNumbers[0].setAttribute('data-target', projetsCount);
+    if (statNumbers[1]) statNumbers[1].setAttribute('data-target', formationsCount);
+    if (statNumbers[2]) statNumbers[2].setAttribute('data-target', partenairesCount);
 }
 
 // ===== RENDU : INTERFACE PUBLIQUE =====
@@ -132,7 +152,7 @@ async function renderActivites() {
         <div class="math-card">
             <div style="font-size: 1.5rem; color: var(--primary);">∫</div>
             <h3>${act.titre}</h3>
-            <p>${truncateText(act.description)}</p>
+            <p>${truncateText(act.description, 120)}</p>
             <div style="margin-top:1rem; font-size:0.8rem; opacity:0.7;">
                 <i class="fas fa-calendar"></i> ${formatDate(act.date_creation)}
             </div>
@@ -140,7 +160,7 @@ async function renderActivites() {
     `).join('');
 }
 
-// ===== NOUVEAU : RENDU DES RÉALISATIONS (AVEC DÉMOS INTÉGRÉES) =====
+// ===== RENDU DES RÉALISATIONS (AVEC DÉMOS INTÉGRÉES) =====
 
 async function renderRealisations() {
     const container = document.getElementById('realisations-container');
@@ -152,30 +172,8 @@ async function renderRealisations() {
     // Combiner les réalisations du JSON + les démos
     const toutesLesRealisations = [
         ...realisationsExistantes,
-        {
-            id: 'demo_carte',
-            titre: DEMOS.carteInteractive.titre,
-            description: DEMOS.carteInteractive.description,
-            categorie: DEMOS.carteInteractive.categorie,
-            technologies: DEMOS.carteInteractive.technologies,
-            demo_url: DEMOS.carteInteractive.url,
-            github_url: DEMOS.carteInteractive.github,
-            date_creation: new Date().toISOString(),
-            est_publie: true,
-            est_demo: true
-        },
-        {
-            id: 'demo_sir',
-            titre: DEMOS.simulateurSIR.titre,
-            description: DEMOS.simulateurSIR.description,
-            categorie: DEMOS.simulateurSIR.categorie,
-            technologies: DEMOS.simulateurSIR.technologies,
-            demo_url: DEMOS.simulateurSIR.url,
-            github_url: DEMOS.simulateurSIR.github,
-            date_creation: new Date().toISOString(),
-            est_publie: true,
-            est_demo: true
-        }
+        DEMOS.carteInteractive,
+        DEMOS.simulateurSIR
     ];
     
     const publiees = toutesLesRealisations.filter(r => r.est_publie === true);
@@ -194,6 +192,11 @@ async function renderRealisations() {
             </div>
             <h3>${projet.titre}</h3>
             <p>${truncateText(projet.description, 120)}</p>
+            ${projet.methodologie ? `
+                <div class="realisation-methodo">
+                    <small><strong>Méthode :</strong> ${truncateText(projet.methodologie, 100)}</small>
+                </div>
+            ` : ''}
             ${projet.technologies ? `
                 <div class="realisation-techs">
                     ${projet.technologies.map(tech => `<span class="tech-tag">${tech}</span>`).join('')}
@@ -256,7 +259,7 @@ async function renderAdminRealisations() {
     const realisations = data.realisations || [];
 
     if (realisations.length === 0) {
-        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune réalisation enregistrée.</td></tr>';
+        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune réalisation enregistrée. Les démos sont visibles sur le site public.</td></tr>';
         return;
     }
 
@@ -271,7 +274,7 @@ async function renderAdminRealisations() {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-            </td>
+             </td>
         </tr>
     `).join('');
 }
@@ -302,7 +305,7 @@ async function renderAdminFormations() {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-            </td>
+             </td>
         </tr>
     `).join('');
 }
@@ -330,7 +333,7 @@ async function renderAdminPartenaires() {
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-             </td>
+              </td>
         </tr>
     `).join('');
 }
@@ -403,7 +406,8 @@ window.saveNewRealisation = function(event) {
         demo_url: demoUrl || '',
         github_url: githubUrl || '',
         date_creation: new Date().toISOString(),
-        est_publie: true
+        est_publie: true,
+        est_demo: false
     });
 
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
