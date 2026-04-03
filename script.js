@@ -1,13 +1,11 @@
-// ===== LAB_MATH - CORE SCRIPT (VERSION COMPLÈTE FINALE) =====
-// Inclut : Activités, Réalisations (avec démos), Annonces, Offres, Formations, Partenaires
-// Compteurs automatiques sur la page d'accueil
+// ===== LAB_MATH - CORE SCRIPT (VERSION AMÉLIORÉE AVEC FORMATIONS & PARTENAIRES) =====
 
 // 1. CONFIGURATION
 const DATA_FILE = 'data.json';
 const LOCAL_STORAGE_KEY = 'labmath_data';
 const equations = ['E = mc²', '∫ f(x) dx', '∑ n²', '∇ × F', '∂u/∂t', 'lim x→0', '∏ k=1', '√(x²+y²)', 'e^{iπ} + 1 = 0', 'Δx Δp ≥ ħ/2'];
 
-// ===== CONFIGURATION DES DÉMOS (À MODIFIER AVEC VOS VRAIS LIENS NETLIFY) =====
+// ===== CONFIGURATION DES DÉMOS (À MODIFIER AVEC VOS VRAIS LIENS) =====
 const DEMOS = {
     carteInteractive: {
         id: 'demo_carte',
@@ -103,7 +101,7 @@ async function loadAllAppData() {
             messages: [],
             formations: [],
             partenaires: [],
-            compteurs: { activites: 0, realisations: 0, annonces: 0, offres: 0, messages: 0 }
+            compteurs: { activites: 0, realisations: 0, annonces: 0, offres: 0, messages: 0, formations: 0, partenaires: 0 }
         };
     }
 }
@@ -113,10 +111,12 @@ async function loadAllAppData() {
 async function updateStatCounters() {
     const data = await loadAllAppData();
     
-    // Compter les éléments
+    // Compter les éléments (réalisations du JSON + démos)
     const realisationsExistantes = data.realisations || [];
     const tousProjets = [...realisationsExistantes, DEMOS.carteInteractive, DEMOS.simulateurSIR];
     const projetsCount = tousProjets.length;
+    
+    // Formations et partenaires
     const formationsCount = (data.formations || []).length;
     const partenairesCount = (data.partenaires || []).length;
     
@@ -218,35 +218,30 @@ async function renderRealisations() {
     `).join('');
 }
 
-// ===== RENDU : INTERFACE ADMIN (TOUS LES TYPES) =====
+// ===== RENDU : INTERFACE ADMIN =====
 
 async function renderAdminActivites() {
-    const container = document.getElementById('activites-table-body');
+    const container = document.getElementById('admin-activites-list');
     if (!container) return;
 
     const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { activites: [] };
     const activites = data.activites || [];
 
     if (activites.length === 0) {
-        container.innerHTML = '<tr><td colspan="6" style="text-align:center;">Aucune activité enregistrée. </td></tr>';
+        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune activité enregistrée. </td></tr>';
         return;
     }
 
-    container.innerHTML = activites.map((act, index) => `
+    container.innerHTML = activites.map(act => `
         <tr>
-            <td><strong>${act.titre || 'Sans titre'}</strong></td>
-            <td>${act.auteur || 'Admin'}</td>
+            <td><strong>${act.titre}</strong></td>
             <td>${formatDate(act.date_creation)}</td>
             <td><span class="status-badge ${act.est_publie ? 'status-published' : 'status-draft'}">
                 ${act.est_publie ? 'Publié' : 'Brouillon'}
             </span></td>
-            <td><span class="sync-status sync-success"></span></td>
             <td>
                 <div style="display:flex; gap:10px;">
-                    <button class="action-btn edit" onclick="editItem('activite', ${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteItem('activite', ${index})">
+                    <button class="action-btn delete" onclick="deleteActivity(${act.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -255,64 +250,27 @@ async function renderAdminActivites() {
     `).join('');
 }
 
+// Admin Réalisations
 async function renderAdminRealisations() {
-    const container = document.getElementById('realisations-table-body');
+    const container = document.getElementById('admin-realisations-list');
     if (!container) return;
 
     const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { realisations: [] };
     const realisations = data.realisations || [];
 
     if (realisations.length === 0) {
-        container.innerHTML = '<tr><td colspan="5" style="text-align:center;">Aucune réalisation enregistrée. Les démos sont visibles sur le site public. </div></td></tr>';
+        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune réalisation enregistrée. Les démos sont visibles sur le site public. </div> </div> ');
         return;
     }
 
-    container.innerHTML = realisations.map((proj, index) => `
+    container.innerHTML = realisations.map(proj => `
         <tr>
-            <td><strong>${proj.titre || 'Sans titre'}</strong> </td>
-            <td>${proj.categorie || 'Non catégorisé'} </td>
-            <td>${formatDate(proj.date_creation)}</td>
-            <td><span class="sync-status sync-success"></span></td>
+            <td><strong>${proj.titre}</strong>  </div>
+            <td>${proj.categorie || 'Non catégorisé'}  </div>
+            <td>${formatDate(proj.date_creation)}</div>
             <td>
                 <div style="display:flex; gap:10px;">
-                    <button class="action-btn edit" onclick="editItem('realisation', ${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteItem('realisation', ${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-              </div>
-        </tr>
-    `).join('');
-}
-
-async function renderAdminFormations() {
-    const container = document.getElementById('formations-table-body');
-    if (!container) return;
-
-    const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { formations: [] };
-    const formations = data.formations || [];
-
-    if (formations.length === 0) {
-        container.innerHTML = '<tr><td colspan="5" style="text-align:center;">Aucune formation enregistrée. </div> </div> ');
-        return;
-    }
-
-    container.innerHTML = formations.map((formation, index) => `
-        <tr>
-            <td><strong>${formation.titre || 'Sans titre'}</strong>  </div>
-            <td>${formation.duree || 'Non spécifiée'} </div>
-            <td><span class="status-badge ${formation.statut === 'Terminé' ? 'status-published' : (formation.statut === 'En cours' ? 'status-active' : 'status-draft')}">
-                ${formation.statut || 'Planifiée'}
-            </span> </div>
-            <td>${formatDate(formation.date_creation)}</div>
-            <td>
-                <div style="display:flex; gap:10px;">
-                    <button class="action-btn edit" onclick="editItem('formation', ${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteItem('formation', ${index})">
+                    <button class="action-btn delete" onclick="deleteRealisation(${proj.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
@@ -321,33 +279,61 @@ async function renderAdminFormations() {
     `).join('');
 }
 
+// Admin Formations
+async function renderAdminFormations() {
+    const container = document.getElementById('admin-formations-list');
+    if (!container) return;
+
+    const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { formations: [] };
+    const formations = data.formations || [];
+
+    if (formations.length === 0) {
+        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucune formation enregistrée. </div> </div> ');
+        return;
+    }
+
+    container.innerHTML = formations.map(formation => `
+        <tr>
+            <td><strong>${formation.titre}</strong>  </div>
+            <td>${formation.duree || 'Non spécifiée'} </div>
+            <td><span class="status-badge ${formation.statut === 'Terminé' ? 'status-published' : (formation.statut === 'En cours' ? 'status-active' : 'status-draft')}">
+                ${formation.statut || 'Planifiée'}
+            </span> </div>
+            <td>
+                <div style="display:flex; gap:10px;">
+                    <button class="action-btn delete" onclick="deleteFormation(${formation.id})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+              </div>
+         ');
+    `).join('');
+}
+
+// Admin Partenaires
 async function renderAdminPartenaires() {
-    const container = document.getElementById('partenaires-table-body');
+    const container = document.getElementById('admin-partenaires-list');
     if (!container) return;
 
     const data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || { partenaires: [] };
     const partenaires = data.partenaires || [];
 
     if (partenaires.length === 0) {
-        container.innerHTML = '<tr><td colspan="4" style="text-align:center;">Aucun partenaire enregistré. </div> </div> ');
+        container.innerHTML = '<tr><td colspan="3" style="text-align:center;">Aucun partenaire enregistré. </div> </div> ');
         return;
     }
 
-    container.innerHTML = partenaires.map((part, index) => `
+    container.innerHTML = partenaires.map(part => `
         <tr>
-            <td><strong>${part.nom || 'Sans nom'}</strong>  </div>
-            <td><span class="status-badge status-published">${part.type || 'Partenariat'}</span> </div>
-            <td>${formatDate(part.date_creation)}</div>
+            <td><strong>${part.nom}</strong>  </div>
+            <td>${part.type || 'Partenariat'} </div>
             <td>
                 <div style="display:flex; gap:10px;">
-                    <button class="action-btn edit" onclick="editItem('partenaire', ${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="action-btn delete" onclick="deleteItem('partenaire', ${index})">
+                    <button class="action-btn delete" onclick="deletePartenaire(${part.id})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </div>
-              </div>
+               </div>
          ');
     `).join('');
 }
@@ -373,8 +359,8 @@ function renderAdminMessages() {
     }
 
     container.innerHTML = [...messages].reverse().map(msg => `
-        <div class="message-card" style="border-left: 4px solid ${msg.lu ? 'rgba(255,255,255,0.1)' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
-            <div class="message-header">
+        <div class="math-card" style="border-left: 4px solid ${msg.lu ? 'rgba(255,255,255,0.1)' : 'var(--primary)'}; background: rgba(255,255,255,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                 <div>
                     <h4 style="color: var(--primary); margin-bottom: 5px;">${msg.sujet}</h4>
                     <small style="color: rgba(255,255,255,0.5);">De: <strong>${msg.nom}</strong> (${msg.email})</small>
@@ -383,10 +369,10 @@ function renderAdminMessages() {
             </div>
             <p style="margin: 15px 0; line-height: 1.6; white-space: pre-wrap;">${msg.contenu}</p>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-sm ${msg.lu ? 'btn-outline' : 'btn-primary'}" onclick="window.toggleRead(${msg.id})">
+                <button class="btn btn-sm ${msg.lu ? 'btn-outline' : 'btn-primary'}" onclick="toggleRead(${msg.id})">
                     <i class="fas ${msg.lu ? 'fa-envelope-open' : 'fa-check'}"></i>
                 </button>
-                <button class="action-btn delete" onclick="window.deleteMessage(${msg.id})">
+                <button class="action-btn delete" onclick="deleteMessage(${msg.id})">
                     <i class="fas fa-trash"></i>
                 </button>
             </div>
@@ -394,7 +380,139 @@ function renderAdminMessages() {
     `).join('');
 }
 
-// ===== ACTIONS GLOBALES (WINDOW) =====
+// ===== NOUVELLES FONCTIONS ADMIN =====
+
+window.saveNewRealisation = function(event) {
+    if (event) event.preventDefault();
+    const titre = document.getElementById('real-titre')?.value;
+    const desc = document.getElementById('real-desc')?.value;
+    const categorie = document.getElementById('real-categorie')?.value;
+    const demoUrl = document.getElementById('real-demo-url')?.value;
+    const githubUrl = document.getElementById('real-github-url')?.value;
+    
+    if(!titre || !desc) {
+        showAlert('error', 'Le titre et la description sont obligatoires !');
+        return;
+    }
+
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    if (!data.realisations) data.realisations = [];
+    
+    data.realisations.push({
+        id: Date.now(),
+        titre,
+        description: desc,
+        categorie: categorie || 'Non catégorisé',
+        demo_url: demoUrl || '',
+        github_url: githubUrl || '',
+        date_creation: new Date().toISOString(),
+        est_publie: true,
+        est_demo: false
+    });
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    closeModal('modal-realisation');
+    showAlert('success', 'Réalisation ajoutée ! Téléchargez le JSON pour GitHub.');
+    renderAdminRealisations();
+    renderRealisations();
+    updateStatCounters();
+};
+
+window.saveNewFormation = function(event) {
+    if (event) event.preventDefault();
+    const titre = document.getElementById('form-titre')?.value;
+    const duree = document.getElementById('form-duree')?.value;
+    const statut = document.getElementById('form-statut')?.value;
+    const programme = document.getElementById('form-programme')?.value;
+    
+    if(!titre) {
+        showAlert('error', 'Le titre est obligatoire !');
+        return;
+    }
+
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    if (!data.formations) data.formations = [];
+    
+    data.formations.push({
+        id: Date.now(),
+        titre,
+        description: document.getElementById('form-desc')?.value || '',
+        duree: duree || 'Non spécifiée',
+        statut: statut || 'Planifiée',
+        programme: programme || '',
+        date_creation: new Date().toISOString()
+    });
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    closeModal('modal-formation');
+    showAlert('success', 'Formation ajoutée !');
+    renderAdminFormations();
+    updateStatCounters();
+};
+
+window.saveNewPartenaire = function(event) {
+    if (event) event.preventDefault();
+    const nom = document.getElementById('part-nom')?.value;
+    const type = document.getElementById('part-type')?.value;
+    const siteWeb = document.getElementById('part-siteweb')?.value;
+    const description = document.getElementById('part-desc')?.value;
+    
+    if(!nom) {
+        showAlert('error', 'Le nom est obligatoire !');
+        return;
+    }
+
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    if (!data.partenaires) data.partenaires = [];
+    
+    data.partenaires.push({
+        id: Date.now(),
+        nom: nom,
+        type: type || 'Partenariat',
+        site_web: siteWeb || '',
+        description: description || '',
+        date_creation: new Date().toISOString()
+    });
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    closeModal('modal-partenaire');
+    showAlert('success', 'Partenaire ajouté !');
+    renderAdminPartenaires();
+    updateStatCounters();
+};
+
+window.deleteRealisation = function(id) {
+    if(!confirm('Supprimer cette réalisation ?')) return;
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    data.realisations = data.realisations.filter(r => r.id !== id);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    renderAdminRealisations();
+    renderRealisations();
+    updateStatCounters();
+    showAlert('success', 'Réalisation supprimée');
+};
+
+window.deleteFormation = function(id) {
+    if(!confirm('Supprimer cette formation ?')) return;
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    data.formations = data.formations.filter(f => f.id !== id);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    renderAdminFormations();
+    updateStatCounters();
+    showAlert('success', 'Formation supprimée');
+};
+
+window.deletePartenaire = function(id) {
+    if(!confirm('Supprimer ce partenaire ?')) return;
+    let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
+    data.partenaires = data.partenaires.filter(p => p.id !== id);
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+    renderAdminPartenaires();
+    updateStatCounters();
+    showAlert('success', 'Partenaire supprimé');
+};
+
+// ===== ACTIONS GLOBALES EXISTANTES =====
 
 window.openModal = (id) => { 
     const modal = document.getElementById(id);
@@ -413,7 +531,6 @@ window.showAlert = (type, message) => {
     setTimeout(() => alert.remove(), 3000);
 };
 
-// Sauvegarde des activités (admin)
 window.saveNewActivity = function(event) {
     event.preventDefault();
     const titre = document.getElementById('act-titre').value;
@@ -437,21 +554,18 @@ window.saveNewActivity = function(event) {
     closeModal('modal-activite');
     showAlert('success', 'Activité ajoutée ! Téléchargez le JSON pour GitHub.');
     renderAdminActivites();
-    if (typeof renderActivites === 'function') renderActivites();
-    if (typeof updateStatCounters === 'function') updateStatCounters();
+    renderActivites();
 };
 
-// Suppression d'activité
 window.deleteActivity = function(id) {
     if(!confirm('Supprimer cette activité ?')) return;
     let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
     data.activites = data.activites.filter(a => a.id !== id);
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
     renderAdminActivites();
-    if (typeof renderActivites === 'function') renderActivites();
+    renderActivites();
 };
 
-// Gestion des messages
 window.toggleRead = function(id) {
     let data = JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY));
     const msg = data.messages.find(m => m.id === id);
@@ -470,7 +584,6 @@ window.deleteMessage = function(id) {
     renderAdminMessages();
 };
 
-// Téléchargement du fichier JSON
 window.downloadData = function() {
     const data = localStorage.getItem(LOCAL_STORAGE_KEY);
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(data);
@@ -489,7 +602,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Charger les données une fois au début
     await loadAllAppData();
 
-    // Mettre à jour les compteurs automatiques (page d'accueil)
+    // Mettre à jour les compteurs automatiques (page d'accueil uniquement)
     if (document.querySelector('.stat-number')) {
         await updateStatCounters();
     }
@@ -498,11 +611,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (document.getElementById('activites-container')) renderActivites();
     if (document.getElementById('realisations-container')) renderRealisations();
     
-    // Admin
-    if (document.getElementById('activites-table-body')) renderAdminActivites();
-    if (document.getElementById('realisations-table-body')) renderAdminRealisations();
-    if (document.getElementById('formations-table-body')) renderAdminFormations();
-    if (document.getElementById('partenaires-table-body')) renderAdminPartenaires();
+    // Admin (uniquement si les conteneurs existent)
+    if (document.getElementById('admin-activites-list')) renderAdminActivites();
+    if (document.getElementById('admin-realisations-list')) renderAdminRealisations();
+    if (document.getElementById('admin-formations-list')) renderAdminFormations();
+    if (document.getElementById('admin-partenaires-list')) renderAdminPartenaires();
     if (document.getElementById('messages-list')) renderAdminMessages();
 
     // Année automatique
