@@ -11,6 +11,46 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
+    <style>
+        /* Additional styles for language switcher */
+        .lang-switch {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid var(--primary);
+            border-radius: 30px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            color: var(--light);
+        }
+        
+        .lang-switch:hover {
+            background: var(--primary);
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+        
+        .lang-switch i {
+            font-size: 1rem;
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body>
     <!-- Particules et formules en arrière-plan -->
@@ -39,15 +79,21 @@
             </div>
             
             <ul class="nav-menu">
-                <li><a href="index.html" class="nav-link active">Accueil</a></li>
-                <li><a href="about.html" class="nav-link">À propos</a></li>
-                <li><a href="#services" class="nav-link">Services</a></li>
-                <li><a href="activites.html" class="nav-link">Activités</a></li>
-                <li><a href="realisations.html" class="nav-link">Réalisations</a></li>
-                <li><a href="annonces.html" class="nav-link">Annonces</a></li>
-                <li><a href="offres.html" class="nav-link">Offres</a></li>
-                <li><a href="contact.html" class="nav-link">Contact</a></li>
-                <li><a href="login.html" class="nav-link"><i class="fas fa-lock"></i> Admin</a></li>
+                <li><a href="index.html" class="nav-link active" data-key="nav-home">Accueil</a></li>
+                <li><a href="about.html" class="nav-link" data-key="nav-about">À propos</a></li>
+                <li><a href="#services" class="nav-link" data-key="nav-services">Services</a></li>
+                <li><a href="activites.html" class="nav-link" data-key="nav-activities">Activités</a></li>
+                <li><a href="realisations.html" class="nav-link" data-key="nav-achievements">Réalisations</a></li>
+                <li><a href="annonces.html" class="nav-link" data-key="nav-announcements">Annonces</a></li>
+                <li><a href="offres.html" class="nav-link" data-key="nav-offers">Offres</a></li>
+                <li><a href="contact.html" class="nav-link" data-key="nav-contact">Contact</a></li>
+                <li><a href="login.html" class="nav-link" data-key="nav-admin"><i class="fas fa-lock"></i> Admin</a></li>
+                <li>
+                    <button class="lang-switch" id="langSwitch">
+                        <i class="fas fa-globe"></i>
+                        <span id="langText">FR</span>
+                    </button>
+                </li>
             </ul>
             
             <button class="nav-toggle">
@@ -61,7 +107,7 @@
         <div class="hero-content">
             <span class="hero-badge">
                 <span class="pulse-dot"></span>
-                Laboratoire de recherche actif
+                <span data-key="hero-badge">Laboratoire de recherche actif</span>
             </span>
             
             <h1 class="hero-title">
@@ -70,30 +116,30 @@
             </h1>
             
             <p class="hero-description">
-                <span class="typing-text"></span>
+                <span class="typing-text" data-key="hero-typing"></span>
             </p>
             
             <div class="stats-container">
                 <div class="stat-item">
                     <span class="stat-number" data-target="150">0</span>
-                    <span class="stat-label">Projets réalisés</span>
+                    <span class="stat-label" data-key="stat-projects">Projets réalisés</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number" data-target="25">0</span>
-                    <span class="stat-label">Formations</span>
+                    <span class="stat-label" data-key="stat-trainings">Formations</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-number" data-target="12">0</span>
-                    <span class="stat-label">Partenaires</span>
+                    <span class="stat-label" data-key="stat-partners">Partenaires</span>
                 </div>
             </div>
             
             <div class="hero-buttons">
-                <a href="activites.html" class="btn btn-primary btn-large">
+                <a href="activites.html" class="btn btn-primary btn-large" data-key="btn-activities">
                     Voir nos activités
                     <i class="fas fa-arrow-right"></i>
                 </a>
-                <a href="contact.html" class="btn btn-outline btn-large">
+                <a href="contact.html" class="btn btn-outline btn-large" data-key="btn-contact">
                     Nous contacter
                 </a>
             </div>
@@ -109,9 +155,9 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    À propos de <span class="gradient-text">Lab_Math</span>
+                    <span data-key="about-title">À propos de</span> <span class="gradient-text">Lab_Math</span>
                 </h2>
-                <p class="section-subtitle">
+                <p class="section-subtitle" data-key="about-subtitle">
                     Laboratoire d'excellence dédié à la recherche en mathématiques appliquées 
                     et au développement d'algorithmes innovants.
                 </p>
@@ -120,22 +166,22 @@
             <div class="math-grid">
                 <div class="math-card glow-card">
                     <div class="feature-icon">∫</div>
-                    <h3>Expertise Pointue</h3>
-                    <p>Notre équipe combine chercheurs et ingénieurs spécialisés en mathématiques appliquées, algorithmique et data science.</p>
+                    <h3 data-key="card-expertise-title">Expertise Pointue</h3>
+                    <p data-key="card-expertise-desc">Notre équipe combine chercheurs et ingénieurs spécialisés en mathématiques appliquées, algorithmique et data science.</p>
                     <div class="card-particles"></div>
                 </div>
                 
                 <div class="math-card glow-card">
                     <div class="feature-icon">∑</div>
-                    <h3>Mission Scientifique</h3>
-                    <p>Développer des solutions mathématiques innovantes répondant aux défis technologiques et industriels contemporains.</p>
+                    <h3 data-key="card-mission-title">Mission Scientifique</h3>
+                    <p data-key="card-mission-desc">Développer des solutions mathématiques innovantes répondant aux défis technologiques et industriels contemporains.</p>
                     <div class="card-particles"></div>
                 </div>
                 
                 <div class="math-card glow-card">
                     <div class="feature-icon">∏</div>
-                    <h3>Collaboration</h3>
-                    <p>Nous travaillons en synergie avec le CIE-SCSM Group pour des projets multidisciplinaires d'envergure en robotique.</p>
+                    <h3 data-key="card-collab-title">Collaboration</h3>
+                    <p data-key="card-collab-desc">Nous travaillons en synergie avec le CIE-SCSM Group pour des projets multidisciplinaires d'envergure en robotique.</p>
                     <div class="card-particles"></div>
                 </div>
             </div>
@@ -147,9 +193,9 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">
-                    Domaines d'<span class="gradient-text">Expertise</span>
+                    <span data-key="services-title">Domaines d'</span><span class="gradient-text" data-key="services-title-highlight">Expertise</span>
                 </h2>
-                <p class="section-subtitle">Des solutions mathématiques innovantes transformées en applications concrètes.</p>
+                <p class="section-subtitle" data-key="services-subtitle">Des solutions mathématiques innovantes transformées en applications concrètes.</p>
             </div>
             
             <div class="math-grid">
@@ -157,8 +203,8 @@
                     <div class="service-icon">
                         <i class="fas fa-brain"></i>
                     </div>
-                    <h3>Intelligence Artificielle</h3>
-                    <p>Développement d'algorithmes de machine learning et deep learning pour des solutions intelligentes.</p>
+                    <h3 data-key="service-ai">Intelligence Artificielle</h3>
+                    <p data-key="service-ai-desc">Développement d'algorithmes de machine learning et deep learning pour des solutions intelligentes.</p>
                     <div class="service-hover-effect"></div>
                 </div>
                 
@@ -166,8 +212,8 @@
                     <div class="service-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
-                    <h3>Data Science</h3>
-                    <p>Analyse avancée de données, modélisation statistique et visualisation interactive.</p>
+                    <h3 data-key="service-ds">Data Science</h3>
+                    <p data-key="service-ds-desc">Analyse avancée de données, modélisation statistique et visualisation interactive.</p>
                     <div class="service-hover-effect"></div>
                 </div>
                 
@@ -175,8 +221,8 @@
                     <div class="service-icon">
                         <i class="fas fa-satellite"></i>
                     </div>
-                    <h3>Géospatial</h3>
-                    <p>Traitement d'images satellitaires et modélisation géospatiale pour l'analyse territoriale.</p>
+                    <h3 data-key="service-geo">Géospatial</h3>
+                    <p data-key="service-geo-desc">Traitement d'images satellitaires et modélisation géospatiale pour l'analyse territoriale.</p>
                     <div class="service-hover-effect"></div>
                 </div>
                 
@@ -184,8 +230,8 @@
                     <div class="service-icon">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <h3>Robotique</h3>
-                    <p>Algorithmes de contrôle et de vision pour systèmes robotiques autonomes.</p>
+                    <h3 data-key="service-robot">Robotique</h3>
+                    <p data-key="service-robot-desc">Algorithmes de contrôle et de vision pour systèmes robotiques autonomes.</p>
                     <div class="service-hover-effect"></div>
                 </div>
                 
@@ -193,8 +239,8 @@
                     <div class="service-icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <h3>Modélisation démographique</h3>
-                    <p>Modèles prédictifs pour l'analyse des dynamiques de population.</p>
+                    <h3 data-key="service-demo">Modélisation démographique</h3>
+                    <p data-key="service-demo-desc">Modèles prédictifs pour l'analyse des dynamiques de population.</p>
                     <div class="service-hover-effect"></div>
                 </div>
                 
@@ -202,8 +248,8 @@
                     <div class="service-icon">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
-                    <h3>Formation Data Scientists</h3>
-                    <p>Programmes de formation avancée en science des données et mathématiques appliquées.</p>
+                    <h3 data-key="service-training">Formation Data Scientists</h3>
+                    <p data-key="service-training-desc">Programmes de formation avancée en science des données et mathématiques appliquées.</p>
                     <div class="service-hover-effect"></div>
                 </div>
             </div>
@@ -214,19 +260,19 @@
     <section id="activites" class="section">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Actualités & <span class="gradient-text">Activités</span></h2>
-                <p class="section-subtitle">Suivez en temps réel les dernières avancées de notre laboratoire.</p>
+                <h2 class="section-title"><span data-key="activities-title">Actualités &</span> <span class="gradient-text" data-key="activities-title-highlight">Activités</span></h2>
+                <p class="section-subtitle" data-key="activities-subtitle">Suivez en temps réel les dernières avancées de notre laboratoire.</p>
             </div>
 
             <div id="activites-container" class="math-grid">
                 <div class="text-center" style="grid-column: 1/-1;">
                     <div class="math-loader"></div>
-                    <p style="color: var(--primary); margin-top: 1rem;">Chargement des activités...</p>
+                    <p style="color: var(--primary); margin-top: 1rem;" data-key="loading-activities">Chargement des activités...</p>
                 </div>
             </div>
             
             <div class="text-center" style="margin-top: 2rem;">
-                <a href="activites.html" class="btn btn-outline">
+                <a href="activites.html" class="btn btn-outline" data-key="btn-view-all">
                     Voir toutes les activités
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -238,19 +284,19 @@
     <section id="realisations" class="section" style="background: var(--darker-bg);">
         <div class="container">
             <div class="section-header">
-                <h2 class="section-title">Nos <span class="gradient-text">Réalisations</span></h2>
-                <p class="section-subtitle">Découvrez les projets et innovations que nous avons concrétisés.</p>
+                <h2 class="section-title"><span data-key="achievements-title">Nos</span> <span class="gradient-text" data-key="achievements-title-highlight">Réalisations</span></h2>
+                <p class="section-subtitle" data-key="achievements-subtitle">Découvrez les projets et innovations que nous avons concrétisés.</p>
             </div>
 
             <div id="realisations-container" class="math-grid">
                 <div class="text-center" style="grid-column: 1/-1;">
                     <div class="math-loader"></div>
-                    <p style="color: var(--primary); margin-top: 1rem;">Chargement des réalisations...</p>
+                    <p style="color: var(--primary); margin-top: 1rem;" data-key="loading-achievements">Chargement des réalisations...</p>
                 </div>
             </div>
             
             <div class="text-center" style="margin-top: 2rem;">
-                <a href="realisations.html" class="btn btn-outline">
+                <a href="realisations.html" class="btn btn-outline" data-key="btn-view-all-achievements">
                     Voir toutes les réalisations
                     <i class="fas fa-arrow-right"></i>
                 </a>
@@ -267,28 +313,28 @@
                         <div class="logo-icon">∑</div>
                         <span class="logo-text">Lab_<span class="gradient-text">Math</span></span>
                     </div>
-                    <p style="color: rgba(224,224,255,0.7); line-height: 1.6;">
+                    <p style="color: rgba(224,224,255,0.7); line-height: 1.6;" data-key="footer-desc">
                         Laboratoire de Mathématiques Appliquées<br>
                         Recherche & Innovation
                     </p>
-                    <p style="margin-top: 1rem; color: var(--primary);">
+                    <p style="margin-top: 1rem; color: var(--primary);" data-key="footer-partner">
                         Partenaire officiel de CIE-SCSM Group
                     </p>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Liens rapides</h4>
+                    <h4 data-key="footer-links">Liens rapides</h4>
                     <ul>
-                        <li><a href="index.html">Accueil</a></li>
-                        <li><a href="about.html">À propos</a></li>
-                        <li><a href="#services">Services</a></li>
-                        <li><a href="activites.html">Activités</a></li>
-                        <li><a href="contact.html">Contact</a></li>
+                        <li><a href="index.html" data-key="footer-home">Accueil</a></li>
+                        <li><a href="about.html" data-key="footer-about">À propos</a></li>
+                        <li><a href="#services" data-key="footer-services">Services</a></li>
+                        <li><a href="activites.html" data-key="footer-activities">Activités</a></li>
+                        <li><a href="contact.html" data-key="footer-contact">Contact</a></li>
                     </ul>
                 </div>
                 
                 <div class="footer-section">
-                    <h4>Contact</h4>
+                    <h4 data-key="footer-contact-title">Contact</h4>
                     <ul>
                         <li><i class="fas fa-envelope"></i> contact@labmath.cm</li>
                         <li><i class="fas fa-phone"></i> +237 620 307 439</li>
@@ -298,13 +344,243 @@
             </div>
             
             <div class="footer-bottom">
-                <p>&copy; 2025 Lab_Math. Tous droits réservés.</p>
-                <p>Propulsé par <span class="gradient-text">∑</span> Mathématiques Appliquées</p>
+                <p data-key="copyright">&copy; 2025 Lab_Math. Tous droits réservés.</p>
+                <p><span data-key="powered-by">Propulsé par</span> <span class="gradient-text">∑</span> <span data-key="math-applied">Mathématiques Appliquées</span></p>
             </div>
         </div>
     </footer>
 
     <script src="config.js"></script>
     <script src="script.js"></script>
+    
+    <script>
+        // Translations dictionary
+        const translations = {
+            fr: {
+                // Navigation
+                "nav-home": "Accueil",
+                "nav-about": "À propos",
+                "nav-services": "Services",
+                "nav-activities": "Activités",
+                "nav-achievements": "Réalisations",
+                "nav-announcements": "Annonces",
+                "nav-offers": "Offres",
+                "nav-contact": "Contact",
+                "nav-admin": "Admin",
+                
+                // Hero
+                "hero-badge": "Laboratoire de recherche actif",
+                "hero-typing": "Laboratoire de Mathématiques Appliquées | Recherche & Innovation",
+                "stat-projects": "Projets réalisés",
+                "stat-trainings": "Formations",
+                "stat-partners": "Partenaires",
+                "btn-activities": "Voir nos activités",
+                "btn-contact": "Nous contacter",
+                
+                // About section
+                "about-title": "À propos de",
+                "about-subtitle": "Laboratoire d'excellence dédié à la recherche en mathématiques appliquées et au développement d'algorithmes innovants.",
+                "card-expertise-title": "Expertise Pointue",
+                "card-expertise-desc": "Notre équipe combine chercheurs et ingénieurs spécialisés en mathématiques appliquées, algorithmique et data science.",
+                "card-mission-title": "Mission Scientifique",
+                "card-mission-desc": "Développer des solutions mathématiques innovantes répondant aux défis technologiques et industriels contemporains.",
+                "card-collab-title": "Collaboration",
+                "card-collab-desc": "Nous travaillons en synergie avec le CIE-SCSM Group pour des projets multidisciplinaires d'envergure en robotique.",
+                
+                // Services section
+                "services-title": "Domaines d'",
+                "services-title-highlight": "Expertise",
+                "services-subtitle": "Des solutions mathématiques innovantes transformées en applications concrètes.",
+                "service-ai": "Intelligence Artificielle",
+                "service-ai-desc": "Développement d'algorithmes de machine learning et deep learning pour des solutions intelligentes.",
+                "service-ds": "Data Science",
+                "service-ds-desc": "Analyse avancée de données, modélisation statistique et visualisation interactive.",
+                "service-geo": "Géospatial",
+                "service-geo-desc": "Traitement d'images satellitaires et modélisation géospatiale pour l'analyse territoriale.",
+                "service-robot": "Robotique",
+                "service-robot-desc": "Algorithmes de contrôle et de vision pour systèmes robotiques autonomes.",
+                "service-demo": "Modélisation démographique",
+                "service-demo-desc": "Modèles prédictifs pour l'analyse des dynamiques de population.",
+                "service-training": "Formation Data Scientists",
+                "service-training-desc": "Programmes de formation avancée en science des données et mathématiques appliquées.",
+                
+                // Activities section
+                "activities-title": "Actualités &",
+                "activities-title-highlight": "Activités",
+                "activities-subtitle": "Suivez en temps réel les dernières avancées de notre laboratoire.",
+                "loading-activities": "Chargement des activités...",
+                "btn-view-all": "Voir toutes les activités",
+                
+                // Achievements section
+                "achievements-title": "Nos",
+                "achievements-title-highlight": "Réalisations",
+                "achievements-subtitle": "Découvrez les projets et innovations que nous avons concrétisés.",
+                "loading-achievements": "Chargement des réalisations...",
+                "btn-view-all-achievements": "Voir toutes les réalisations",
+                
+                // Footer
+                "footer-desc": "Laboratoire de Mathématiques Appliquées<br>Recherche & Innovation",
+                "footer-partner": "Partenaire officiel de CIE-SCSM Group",
+                "footer-links": "Liens rapides",
+                "footer-home": "Accueil",
+                "footer-about": "À propos",
+                "footer-services": "Services",
+                "footer-activities": "Activités",
+                "footer-contact": "Contact",
+                "footer-contact-title": "Contact",
+                "copyright": "© 2025 Lab_Math. Tous droits réservés.",
+                "powered-by": "Propulsé par",
+                "math-applied": "Mathématiques Appliquées"
+            },
+            en: {
+                // Navigation
+                "nav-home": "Home",
+                "nav-about": "About",
+                "nav-services": "Services",
+                "nav-activities": "Activities",
+                "nav-achievements": "Achievements",
+                "nav-announcements": "Announcements",
+                "nav-offers": "Offers",
+                "nav-contact": "Contact",
+                "nav-admin": "Admin",
+                
+                // Hero
+                "hero-badge": "Active Research Laboratory",
+                "hero-typing": "Applied Mathematics Laboratory | Research & Innovation",
+                "stat-projects": "Projects Completed",
+                "stat-trainings": "Trainings",
+                "stat-partners": "Partners",
+                "btn-activities": "View our activities",
+                "btn-contact": "Contact us",
+                
+                // About section
+                "about-title": "About",
+                "about-subtitle": "Center of excellence dedicated to research in applied mathematics and development of innovative algorithms.",
+                "card-expertise-title": "Specialized Expertise",
+                "card-expertise-desc": "Our team combines researchers and engineers specialized in applied mathematics, algorithms and data science.",
+                "card-mission-title": "Scientific Mission",
+                "card-mission-desc": "Developing innovative mathematical solutions to meet contemporary technological and industrial challenges.",
+                "card-collab-title": "Collaboration",
+                "card-collab-desc": "We work in synergy with CIE-SCSM Group for large-scale multidisciplinary robotics projects.",
+                
+                // Services section
+                "services-title": "Areas of ",
+                "services-title-highlight": "Expertise",
+                "services-subtitle": "Innovative mathematical solutions transformed into concrete applications.",
+                "service-ai": "Artificial Intelligence",
+                "service-ai-desc": "Development of machine learning and deep learning algorithms for intelligent solutions.",
+                "service-ds": "Data Science",
+                "service-ds-desc": "Advanced data analysis, statistical modeling and interactive visualization.",
+                "service-geo": "Geospatial",
+                "service-geo-desc": "Satellite image processing and geospatial modeling for territorial analysis.",
+                "service-robot": "Robotics",
+                "service-robot-desc": "Control and vision algorithms for autonomous robotic systems.",
+                "service-demo": "Demographic Modeling",
+                "service-demo-desc": "Predictive models for population dynamics analysis.",
+                "service-training": "Data Scientist Training",
+                "service-training-desc": "Advanced training programs in data science and applied mathematics.",
+                
+                // Activities section
+                "activities-title": "News &",
+                "activities-title-highlight": "Activities",
+                "activities-subtitle": "Follow the latest advances of our laboratory in real time.",
+                "loading-activities": "Loading activities...",
+                "btn-view-all": "View all activities",
+                
+                // Achievements section
+                "achievements-title": "Our",
+                "achievements-title-highlight": "Achievements",
+                "achievements-subtitle": "Discover the projects and innovations we have realized.",
+                "loading-achievements": "Loading achievements...",
+                "btn-view-all-achievements": "View all achievements",
+                
+                // Footer
+                "footer-desc": "Applied Mathematics Laboratory<br>Research & Innovation",
+                "footer-partner": "Official partner of CIE-SCSM Group",
+                "footer-links": "Quick links",
+                "footer-home": "Home",
+                "footer-about": "About",
+                "footer-services": "Services",
+                "footer-activities": "Activities",
+                "footer-contact": "Contact",
+                "footer-contact-title": "Contact",
+                "copyright": "© 2025 Lab_Math. All rights reserved.",
+                "powered-by": "Powered by",
+                "math-applied": "Applied Mathematics"
+            }
+        };
+        
+        let currentLang = 'fr';
+        
+        // Function to update all text content
+        function updateLanguage(lang) {
+            // Update all elements with data-key attribute
+            document.querySelectorAll('[data-key]').forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[lang][key]) {
+                    // Handle HTML content for elements that may contain HTML
+                    if (key === 'hero-typing' || key === 'footer-desc') {
+                        element.innerHTML = translations[lang][key];
+                    } else {
+                        element.textContent = translations[lang][key];
+                    }
+                }
+            });
+            
+            // Update HTML lang attribute
+            document.documentElement.lang = lang;
+            
+            // Update button text
+            const langText = document.getElementById('langText');
+            if (langText) {
+                langText.textContent = lang.toUpperCase();
+            }
+            
+            // Save preference to localStorage
+            localStorage.setItem('lab_math_language', lang);
+            
+            // Trigger any custom event for other scripts to react
+            window.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+        }
+        
+        // Toggle language function
+        function toggleLanguage() {
+            currentLang = currentLang === 'fr' ? 'en' : 'fr';
+            updateLanguage(currentLang);
+            
+            // Update typing effect text if the typing script is present
+            if (typeof updateTypingText === 'function') {
+                updateTypingText(translations[currentLang]['hero-typing']);
+            }
+        }
+        
+        // Initialize language from localStorage or default to French
+        function initLanguage() {
+            const savedLang = localStorage.getItem('lab_math_language');
+            if (savedLang && (savedLang === 'fr' || savedLang === 'en')) {
+                currentLang = savedLang;
+                updateLanguage(currentLang);
+            } else {
+                // Check browser language
+                const browserLang = navigator.language || navigator.userLanguage;
+                if (browserLang.startsWith('en')) {
+                    currentLang = 'en';
+                    updateLanguage(currentLang);
+                } else {
+                    currentLang = 'fr';
+                    updateLanguage(currentLang);
+                }
+            }
+        }
+        
+        // Add event listener to language switch button
+        const langSwitchBtn = document.getElementById('langSwitch');
+        if (langSwitchBtn) {
+            langSwitchBtn.addEventListener('click', toggleLanguage);
+        }
+        
+        // Initialize language on page load
+        initLanguage();
+    </script>
 </body>
 </html>
